@@ -1,0 +1,9 @@
+cocos2d/
+cocos2d-x-3.17.2.zip
+proj.android/app/.cxx/
+proj.android/app/build/
+proj.android/app/debug/Sevens-debug.apk
+proj.android/app/release/Sevens-release.apk
+proj.android/.gradle/
+proj.linux/
+proj.win32/
