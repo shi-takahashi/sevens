@@ -21,10 +21,10 @@
     <orderEntry type="jdk" jdkName="Android API 34, extension level 7 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module" module-name="proj.android.libcocos2dx.main" scope="TEST" />
-    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/Sevens-master/cocos2d/cocos/platform/android/java/libs/android-async-http-1.4.9.jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/Sevens-master/cocos2d/cocos/platform/android/java/libs/com.android.vending.expansion.zipfile.jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/Sevens-master/cocos2d/cocos/platform/android/java/libs/httpclient-4.4.1.1.jar" level="project" />
-    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/Sevens-master/cocos2d/cocos/platform/android/java/libs/oppoSDK.jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/sevens/cocos2d/cocos/platform/android/java/libs/android-async-http-1.4.9.jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/sevens/cocos2d/cocos/platform/android/java/libs/com.android.vending.expansion.zipfile.jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/sevens/cocos2d/cocos/platform/android/java/libs/httpclient-4.4.1.1.jar" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: /Users/takahashi-sh/Project/sevens/cocos2d/cocos/platform/android/java/libs/oppoSDK.jar" level="project" />
   </component>
   <component name="TestModuleProperties" production-module="proj.android.libcocos2dx.main" />
 </module>

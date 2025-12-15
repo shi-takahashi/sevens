@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/388101326/platform.proj.android.libcocos2dx.iml" filepath="$PROJECT_DIR$/.idea/modules/388101326/platform.proj.android.libcocos2dx.iml" />
       <module fileurl="file://$PROJECT_DIR$/proj.android.iml" filepath="$PROJECT_DIR$/proj.android.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.iml" filepath="$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/proj.android.Sevens.unitTest.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.iml" filepath="$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.androidTest.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.main.iml" filepath="$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/1209408085/proj.android.libcocos2dx.unitTest.iml" />

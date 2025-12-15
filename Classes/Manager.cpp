@@ -172,7 +172,7 @@ void Manager::updateCardData(Character* character, Command command, Card* card)
                 character->hands->eraseCard(card, !character->isPlayer());
                 this->table_cards.emplace_back(card);
             }
-            if (command == Command::PUT_ALL && character->hands->jokerOnly())
+            if (character->hands->jokerOnly())
             {
                 character->hands->clear();
             }
