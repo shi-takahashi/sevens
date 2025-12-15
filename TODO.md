@@ -1,10 +1,10 @@
 # Sevens アプリ リリース準備タスク
 
-## 📅 作成日: 2024年12月14日
+## 📅 作成日: 2025年12月14日
 
 ---
 
-## ✅ 完了したタスク（2024/12/14）
+## ✅ 完了したタスク（2025/12/15）
 
 ### ビルド環境の現代化
 - [x] cocos2d-x 3.17.2のダウンロードと統合
@@ -42,10 +42,10 @@
 **理由**: AdMobを使用しているため必須
 
 **タスク**:
-- [ ] プライバシーポリシーページを作成（HTML）
-- [ ] Webサーバーにアップロード（例: GitHub Pages、個人サーバー）
-- [ ] URLを取得
-- [ ] Google Play Consoleに登録
+- [x] プライバシーポリシーページを作成（HTML）
+- [x] Webサーバーにアップロード（例: GitHub Pages、個人サーバー）
+- [x] URLを取得
+- [x] Google Play Consoleに登録
 
 **プライバシーポリシーに含めるべき内容**:
 - 収集する情報（広告ID、デバイス情報）
@@ -61,14 +61,14 @@ https://www.privacypolicies.com/blog/privacy-policy-template/
 
 #### 2. Google Play Consoleの設定
 **必要な作業**:
-- [ ] データセーフティの申告
+- [x] データセーフティの申告
   - 広告IDの収集を申告
   - 収集データの用途を説明
-- [ ] アプリコンテンツの設定
+- [x] アプリコンテンツの設定
   - 広告の有無: あり
   - ターゲット年齢層を設定
   - コンテンツレーティング
-- [ ] プライバシーポリシーURLの登録
+- [x] プライバシーポリシーURLの登録
 
 ---
 
@@ -174,23 +174,23 @@ https://www.privacypolicies.com/blog/privacy-policy-template/
 - [x] 署名の確認
 - [x] 64ビット対応
 - [x] targetSdkVersion 34
-- [ ] プライバシーポリシーURL
+- [x] プライバシーポリシーURL
 
 ### Google Play Consoleでの作業
-- [ ] アプリの作成/選択
-- [ ] AABのアップロード
-- [ ] ストアリスティングの作成
+- [x] アプリの作成/選択
+- [x] AABのアップロード
+- [x] ストアリスティングの作成
   - アプリ名
   - 簡単な説明
   - 詳しい説明
   - スクリーンショット（最低2枚）
   - アイコン
-- [ ] データセーフティの申告
-- [ ] プライバシーポリシーの登録
-- [ ] コンテンツレーティングの取得
-- [ ] 価格と配信地域の設定
-- [ ] リリースノートの作成
-- [ ] 審査に送信
+- [x] データセーフティの申告
+- [x] プライバシーポリシーの登録
+- [x] コンテンツレーティングの取得
+- [x] 価格と配信地域の設定
+- [x] リリースノートの作成
+- [x] 審査に送信
 
 ---
 
@@ -249,8 +249,8 @@ cd /Users/takahashi-sh/Project/Sevens-master/proj.android
 
 ### パッケージ情報
 - Package Name: `s_takahashi.java_conf.gr.jp`
-- Version Code: 14
-- Version Name: 1.14
+- Version Code: 20
+- Version Name: 1.3
 
 ---
 
@@ -278,5 +278,5 @@ cd /Users/takahashi-sh/Project/Sevens-master/proj.android
 
 ---
 
-**最終更新**: 2024年12月14日
-**次回作業予定**: プライバシーポリシーの作成 → Google Play Console設定
+**最終更新**: 2025年12月15日
+**次回作業予定**: プライバシーポリシーの作成 → ランキング機能のFirestore移行
