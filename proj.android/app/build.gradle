@@ -18,7 +18,7 @@ android {
         applicationId "s_takahashi.java_conf.gr.jp"
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
-        versionCode 19
+        versionCode 20
         versionName "1.3"
 
         externalNativeBuild {
