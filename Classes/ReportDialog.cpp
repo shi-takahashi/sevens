@@ -31,7 +31,8 @@ bool ReportDialog::init()
     Size visibleSize { Director::getInstance()->getVisibleSize() };
     Sprite* bgSprite { Sprite::create("report_bg.png") };
     bgSprite->setPosition(visibleSize / 2);
-    bgSprite->setVisible(false);
+    // TODO: ランキング機能実装後にfalseに戻す（ランキング取得後にtrueにする）
+    bgSprite->setVisible(true);
     this->addChild(bgSprite);
     
     ui::Button* closeButton { ui::Button::create("close_icon.png") };
@@ -61,12 +62,13 @@ bool ReportDialog::init()
     item3->setString("連勝記録");
     bgSprite->addChild(item3, 0);
     
-    Label* item4 = Label::createWithSystemFont("", "ariel", 40);
-    item4->setAnchorPoint(Vec2(0, 0));
-    item4->setPosition(Vec2(50, 50));
-    item4->setColor(Color3B(255, 255, 255));
-    item4->setString("全国順位");
-    bgSprite->addChild(item4, 0);
+    // TODO: ランキング機能実装後に復活させる
+    // Label* item4 = Label::createWithSystemFont("", "ariel", 40);
+    // item4->setAnchorPoint(Vec2(0, 0));
+    // item4->setPosition(Vec2(50, 50));
+    // item4->setColor(Color3B(255, 255, 255));
+    // item4->setString("全国順位");
+    // bgSprite->addChild(item4, 0);
     
     int playerWinCount = UserDefault::getInstance()->getIntegerForKey("playerWinCount", 0);
     int playerLoseCount0 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount0", 0);
@@ -104,23 +106,24 @@ bool ReportDialog::init()
     streak->setString(StringUtils::format("%d", playerStreak));
     bgSprite->addChild(streak, 0);
     
-    Label* ranking_label = Label::createWithSystemFont("", "ariel", 40);
-    ranking_label->setAnchorPoint(Vec2(0, 0));
-    ranking_label->setPosition(Vec2(250, 50));
-    ranking_label->setColor(Color3B(255, 255, 255));
-    bgSprite->addChild(ranking_label, 0);
-    
-    NetRanking::getNetRanking()->getMyRank(global_user_id,
-                                           [bgSprite, ranking_label](int ranking) {
-                                               ranking_label->setString(StringUtils::format("%d位", ranking));
-                                               bgSprite->setVisible(true);
-                                           },
-                                           [bgSprite, ranking_label]() {
-                                               ranking_label->setString("?");
-                                               ranking_label->setVisible(true);
-                                               bgSprite->setVisible(true);
-                                           }
-                                           );
+    // TODO: ランキング機能実装後に復活させる
+    // Label* ranking_label = Label::createWithSystemFont("", "ariel", 40);
+    // ranking_label->setAnchorPoint(Vec2(0, 0));
+    // ranking_label->setPosition(Vec2(250, 50));
+    // ranking_label->setColor(Color3B(255, 255, 255));
+    // bgSprite->addChild(ranking_label, 0);
+    //
+    // NetRanking::getNetRanking()->getMyRank(global_user_id,
+    //                                        [bgSprite, ranking_label](int ranking) {
+    //                                            ranking_label->setString(StringUtils::format("%d位", ranking));
+    //                                            bgSprite->setVisible(true);
+    //                                        },
+    //                                        [bgSprite, ranking_label]() {
+    //                                            ranking_label->setString("?");
+    //                                            ranking_label->setVisible(true);
+    //                                            bgSprite->setVisible(true);
+    //                                        }
+    //                                        );
 
     return true;
 }

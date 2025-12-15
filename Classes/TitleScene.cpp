@@ -44,15 +44,16 @@ bool TitleScene::init()
     startButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::touchEvent, this));
     this->addChild(startButton);
     
-    ui::Button* nameButton { ui::Button::create("name_button.png") };
-    nameButton->setPosition(Vec2(1194.0f, 398.0f));
-    nameButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::nameButtonTouched, this));
-    this->addChild(nameButton);
-    
-    ui::Button* rankingButton { ui::Button::create("ranking_button.png") };
-    rankingButton->setPosition(Vec2(1194.0f, 312.0f));
-    rankingButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::rankingButtonTouched, this));
-    this->addChild(rankingButton);
+    // TODO: ランキング機能実装後に復活させる
+    // ui::Button* nameButton { ui::Button::create("name_button.png") };
+    // nameButton->setPosition(Vec2(1194.0f, 398.0f));
+    // nameButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::nameButtonTouched, this));
+    // this->addChild(nameButton);
+
+    // ui::Button* rankingButton { ui::Button::create("ranking_button.png") };
+    // rankingButton->setPosition(Vec2(1194.0f, 312.0f));
+    // rankingButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::rankingButtonTouched, this));
+    // this->addChild(rankingButton);
     
     ui::Button* resultButton { ui::Button::create("report_button.png") };
     resultButton->setPosition(Vec2(1194.0f, 226.0f));
@@ -78,10 +79,11 @@ bool TitleScene::init()
 
 void TitleScene::onEnterTransitionDidFinish()
 {
-    if (global_user_name.empty()) {
-        NameEdit* option { NameEdit::create() };
-        this->addChild(option);
-    }
+    // TODO: ランキング機能実装後に復活させる
+    // if (global_user_name.empty()) {
+    //     NameEdit* option { NameEdit::create() };
+    //     this->addChild(option);
+    // }
 }
 
 void TitleScene::touchEvent(Ref* pSender, ui::Widget::TouchEventType type)

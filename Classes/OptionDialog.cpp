@@ -130,32 +130,33 @@ bool OptionDialog::init()
     tunnelButtonOff->setScale(0.5f);
     bgSprite->addChild(tunnelButtonOff);
     
-    Label* netLabel = Label::createWithSystemFont("", "ariel", 40);
-    netLabel->setAnchorPoint(Vec2(0, 0));
-    netLabel->setPosition(Vec2(15, 60));
-    netLabel->setColor(Color3B(255, 255, 255));
-    netLabel->setString("通信");
-    bgSprite->addChild(netLabel, 0);
-    
-    netButtonOn = ui::Button::create();
-    netButtonOn->setPosition(Vec2(295.0f, 85));
-    netButtonOn->addTouchEventListener(CC_CALLBACK_2(OptionDialog::buttonTouched, this));
-    netButtonOn->setTag(NET_BUTTON_ON_TAG);
-    netButtonOn->setScale(0.5f);
-    bgSprite->addChild(netButtonOn);
-    
-    netButtonOff = ui::Button::create();
-    netButtonOff->setPosition(Vec2(415.0f, 85));
-    netButtonOff->addTouchEventListener(CC_CALLBACK_2(OptionDialog::buttonTouched, this));
-    netButtonOff->setTag(NET_BUTTON_OFF_TAG);
-    netButtonOff->setScale(0.5f);
-    bgSprite->addChild(netButtonOff);
-    
+    // TODO: ランキング機能実装後に復活させる
+    // Label* netLabel = Label::createWithSystemFont("", "ariel", 40);
+    // netLabel->setAnchorPoint(Vec2(0, 0));
+    // netLabel->setPosition(Vec2(15, 60));
+    // netLabel->setColor(Color3B(255, 255, 255));
+    // netLabel->setString("通信");
+    // bgSprite->addChild(netLabel, 0);
+    //
+    // netButtonOn = ui::Button::create();
+    // netButtonOn->setPosition(Vec2(295.0f, 85));
+    // netButtonOn->addTouchEventListener(CC_CALLBACK_2(OptionDialog::buttonTouched, this));
+    // netButtonOn->setTag(NET_BUTTON_ON_TAG);
+    // netButtonOn->setScale(0.5f);
+    // bgSprite->addChild(netButtonOn);
+    //
+    // netButtonOff = ui::Button::create();
+    // netButtonOff->setPosition(Vec2(415.0f, 85));
+    // netButtonOff->addTouchEventListener(CC_CALLBACK_2(OptionDialog::buttonTouched, this));
+    // netButtonOff->setTag(NET_BUTTON_OFF_TAG);
+    // netButtonOff->setScale(0.5f);
+    // bgSprite->addChild(netButtonOff);
+
     soundSettingDisplayChange();
     speedSettingDisplayChange();
     jokerSettingDisplayChange();
     tunnelSettingDisplayChange();
-    netSettingDisplayChange();
+    // netSettingDisplayChange();
     
     return true;
 }
