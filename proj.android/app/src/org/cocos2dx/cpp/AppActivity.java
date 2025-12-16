@@ -27,6 +27,7 @@ package org.cocos2dx.cpp;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import org.cocos2dx.lib.Cocos2dxActivity;
 import android.os.Build;
 import android.view.WindowManager;
@@ -39,13 +40,16 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
+import com.google.firebase.analytics.FirebaseAnalytics;
 import java.util.Arrays;
 
 public class AppActivity extends Cocos2dxActivity {
 
+    private static final String TAG = "AppActivity";
     private static InterstitialAd interstitialAd;
     private static Context context = null;
     private static SharedPreferences sharedPref;
+    private static FirebaseAnalytics firebaseAnalytics;
 
     private static native void resumeNext();
 
@@ -71,6 +75,16 @@ public class AppActivity extends Cocos2dxActivity {
         // DO OTHER INITIALIZATION BELOW
 
         context = this;
+
+        // Initialize Firebase Analytics
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+        Log.d(TAG, "Firebase Analytics initialized");
+
+        // Log app_start event for testing
+        Bundle bundle = new Bundle();
+        bundle.putString("test_param", "hello");
+        firebaseAnalytics.logEvent("app_start", bundle);
+        Log.d(TAG, "Sent app_start event");
 
         // Initialize Mobile Ads SDK
         MobileAds.initialize(this);
@@ -140,5 +154,17 @@ public class AppActivity extends Cocos2dxActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putInt(key, value);
         editor.commit();
+    }
+
+    // ========== Firebase Analytics ==========
+
+    public static void logEvent(String eventName, String paramName, String paramValue) {
+        if (firebaseAnalytics == null) return;
+        Bundle bundle = new Bundle();
+        if (paramName != null && paramValue != null) {
+            bundle.putString(paramName, paramValue);
+        }
+        firebaseAnalytics.logEvent(eventName, bundle);
+        Log.d(TAG, "Logged event: " + eventName);
     }
 }

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "119371418728",
+    "project_id": "sevens-dev-b0281",
+    "storage_bucket": "sevens-dev-b0281.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:119371418728:android:bd8599a86a422425503fdd",
+        "android_client_info": {
+          "package_name": "s_takahashi.java_conf.gr.jp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV_9Vs_G6TLuTuBQ69tt34mqsa9y29cTo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
