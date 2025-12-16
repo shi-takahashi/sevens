@@ -8,12 +8,22 @@
 
 ### ビルド環境の現代化
 - [x] cocos2d-x 3.17.2のダウンロードと統合
-- [x] Gradle 8.5 + Android Gradle Plugin 8.1.4へアップデート
+- [x] Gradle 8.7 + Android Gradle Plugin 8.5.2へアップデート
 - [x] jcenter → mavenCentral への移行
-- [x] targetSdkVersion 34（Android 14対応）
+- [x] targetSdkVersion 35（Android 15対応）
 - [x] 64ビット対応（armeabi-v7a + arm64-v8a）
 - [x] AndroidX対応
 - [x] CMakeビルドシステムへ切り替え（ndk-buildから）
+- [x] NDK 27.0.12077973へアップデート
+- [x] 16KBページサイズ対応（Android 15必須要件）
+
+### ランキング機能の一時無効化
+- [x] 名前変更ボタン非表示（TitleScene.cpp）
+- [x] ランキングボタン非表示（TitleScene.cpp）
+- [x] ゲームクリア後の通信処理コメントアウト（Manager.cpp）
+- [x] 成績画面の全国順位非表示（ReportDialog.cpp）
+- [x] オプション画面の通信設定非表示（OptionDialog.cpp）
+※ すべて `// TODO: ランキング機能実装後に復活させる` でマーク済み
 
 ### 依存関係の更新
 - [x] AdMob SDK 19.1.0 → 22.6.0への更新
@@ -74,42 +84,80 @@ https://www.privacypolicies.com/blog/privacy-policy-template/
 
 ### 優先度：中（機能改善）
 
-#### 3. ランキング機能のFirestore移行
+#### 3. Firebase導入（ランキング + Analytics）
 **現状**:
 - PHP + MySQL（`https://x723.xsrv.jp/sevens/get_ranking.php`）
 - データベースが存在しない
+- ランキング機能は一時的にコメントアウト中
 
-**移行方法の選択肢**:
+**導入するFirebase機能**:
+- **Firestore** - ランキングデータ管理
+- **Analytics** - ユーザー行動分析（アクティブユーザー数、画面閲覧数等）
+- **匿名認証** - ユーザー識別（将来的に必要な場合）
 
-**オプションA: Firebase Firestore + REST API**
-- Firebase Firestoreでランキングデータを管理
-- cocos2d-xからHTTP経由でアクセス
-- 実装難易度: 中
-- メリット: C++コード変更が少ない
+**実装方式: Java SDK + JNI（決定）**
+```
+[C++ cocos2d-x] ←JNI→ [Java Firebase SDK]
+```
+- AdMobと同じパターンで実装（AppActivity.java経由）
+- Firebase C++ SDKの互換性問題を回避
+- Analyticsを使うにはJava SDKが必要
 
-**オプションB: Firebase C++ SDK**
-- Firebase C++ SDKを直接統合
-- 実装難易度: 高
-- メリット: リアルタイム更新が可能
+**環境分離（テスト/本番）**:
+```
+app/src/
+├── debug/
+│   └── google-services.json  ← テスト用Firebaseプロジェクト
+└── release/
+    └── google-services.json  ← 本番用Firebaseプロジェクト
+```
+
+**Firestoreデータベース設計**:
+```
+rankings/
+  {userId}/
+    - name: string        # プレイヤー名
+    - score: number       # 勝利数
+    - updatedAt: timestamp
+```
+
+**ランキング取得方式**:
+- 初期: シンプル方式（1000人規模なら問題なし）
+  ```javascript
+  // トップ100取得
+  db.collection("rankings").orderBy("score", "desc").limit(100)
+
+  // 自分の順位
+  db.collection("rankings").where("score", ">", myScore).count()
+  ```
+- 将来: 重くなったらCloud Functionsで順位を事前計算（無停止で移行可能）
+
+**オフライン対応（重要）**:
+- Firebaseに接続できない場合でもゲーム自体はプレイ可能にする
+- ランキング機能は「接続エラー」等を表示し、ゲームプレイには影響させない
+- 実装方針:
+  - Firebase接続はタイムアウト付きで非同期実行
+  - 接続失敗時はランキング表示をスキップ or エラーメッセージ表示
+  - ゲームクリア後のスコア送信失敗時もゲーム進行に影響なし
+  - 次回起動時に再送信などの複雑な仕組みは不要（シンプルに失敗を許容）
 
 **タスク**:
-- [ ] Firebaseプロジェクトの作成
-- [ ] Firestoreデータベースの設計
-  ```
-  rankings/
-    {userId}/
-      - name: string
-      - score: number
-      - timestamp: timestamp
-  ```
+- [ ] Firebaseプロジェクトの作成（テスト用・本番用）
+- [ ] google-services.jsonの配置（debug/release）
+- [ ] Firebase SDK導入（build.gradle）
+- [ ] Analytics導入・動作確認
+- [ ] Firestore導入
 - [ ] セキュリティルールの設定
-- [ ] 実装方法の選択
-- [ ] コード実装
+- [ ] JNI連携コード実装
+- [ ] NetRanking.cppの書き換え
+- [ ] コメントアウトしたUI復活
 - [ ] テスト
 
 **関連ファイル**:
 - `Classes/NetRanking.cpp`
 - `Classes/NetRanking.h`
+- `proj.android/app/src/org/cocos2dx/cpp/AppActivity.java`
+- `proj.android/app/build.gradle`
 
 #### 4. アプリ終了ボタンの追加
 **実装方法**:
@@ -251,6 +299,14 @@ cd /Users/takahashi-sh/Project/Sevens-master/proj.android
 - Package Name: `s_takahashi.java_conf.gr.jp`
 - Version Code: 20
 - Version Name: 1.3
+
+### ビルド環境
+- Gradle: 8.7
+- Android Gradle Plugin: 8.5.2
+- NDK: 27.0.12077973
+- compileSdkVersion: 34
+- targetSdkVersion: 35
+- minSdkVersion: 21
 
 ---
 
