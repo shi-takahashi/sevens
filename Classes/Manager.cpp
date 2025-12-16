@@ -302,15 +302,14 @@ void Manager::end()
     UserDefault::getInstance()->setIntegerForKey("npcWinCount2", npcWinCount2);
     UserDefault::getInstance()->setIntegerForKey("npcLoseCount2", npcLoseCount2);
     
-    // TODO: ランキング機能実装後に復活させる
-    // int playerLoseCount = playerLoseCount0 + playerLoseCount1 + playerLoseCount2;
-    // NetRanking::getNetRanking()->setMyRank(global_user_od_id, global_user_name, playerWinCount, playerLoseCount,
-    //                                        [](std::string odId) {
-    //                                            if (global_user_od_id.empty()) {
-    //                                                global_user_od_id = odId;
-    //                                                UserDefault::getInstance()->setStringForKey("userOdId", global_user_od_id);
-    //                                            }
-    //                                        });
+    int playerLoseCount = playerLoseCount0 + playerLoseCount1 + playerLoseCount2;
+    NetRanking::getNetRanking()->setMyRank(global_user_od_id, global_user_name, playerWinCount, playerLoseCount,
+                                           [](std::string odId) {
+                                               if (global_user_od_id.empty()) {
+                                                   global_user_od_id = odId;
+                                                   UserDefault::getInstance()->setStringForKey("userOdId", global_user_od_id);
+                                               }
+                                           });
     
     std::string user_name = "あなた";
     if (!global_user_name.empty() && global_user_name != USER_NAME_NONE) {
