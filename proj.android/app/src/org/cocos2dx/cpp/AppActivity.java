@@ -204,7 +204,7 @@ public class AppActivity extends Cocos2dxActivity {
 
         db.collection("rankings")
             .orderBy("score", Query.Direction.DESCENDING)
-            .limit(100)
+            .limit(10)
             .get()
             .addOnSuccessListener(querySnapshot -> {
                 StringBuilder json = new StringBuilder("[");
