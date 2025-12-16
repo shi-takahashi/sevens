@@ -41,7 +41,16 @@ import com.google.android.gms.ads.RequestConfiguration;
 import com.google.android.gms.ads.interstitial.InterstitialAd;
 import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.firebase.firestore.AggregateQuery;
+import com.google.firebase.firestore.AggregateSource;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.SetOptions;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AppActivity extends Cocos2dxActivity {
 
@@ -50,8 +59,17 @@ public class AppActivity extends Cocos2dxActivity {
     private static Context context = null;
     private static SharedPreferences sharedPref;
     private static FirebaseAnalytics firebaseAnalytics;
+    private static FirebaseFirestore db;
 
     private static native void resumeNext();
+
+    // Firestore callbacks to C++
+    private static native void onRankingLoaded(String jsonData);
+    private static native void onRankingLoadFailed();
+    private static native void onMyRankLoaded(int rank);
+    private static native void onMyRankLoadFailed();
+    private static native void onScoreSaved(String odId);
+    private static native void onScoreSaveFailed();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,6 +97,10 @@ public class AppActivity extends Cocos2dxActivity {
         // Initialize Firebase Analytics
         firebaseAnalytics = FirebaseAnalytics.getInstance(this);
         Log.d(TAG, "Firebase Analytics initialized");
+
+        // Initialize Firestore
+        db = FirebaseFirestore.getInstance();
+        Log.d(TAG, "Firestore initialized");
 
         // Log app_start event for testing
         Bundle bundle = new Bundle();
@@ -166,5 +188,142 @@ public class AppActivity extends Cocos2dxActivity {
         }
         firebaseAnalytics.logEvent(eventName, bundle);
         Log.d(TAG, "Logged event: " + eventName);
+    }
+
+    // ========== Firestore Ranking ==========
+
+    /**
+     * Get top 100 rankings
+     * Called from C++
+     */
+    public static void getRanking(final String odId) {
+        if (db == null) {
+            onRankingLoadFailed();
+            return;
+        }
+
+        db.collection("rankings")
+            .orderBy("score", Query.Direction.DESCENDING)
+            .limit(100)
+            .get()
+            .addOnSuccessListener(querySnapshot -> {
+                StringBuilder json = new StringBuilder("[");
+                int rank = 1;
+                boolean first = true;
+                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                    if (!first) json.append(",");
+                    first = false;
+
+                    String name = doc.getString("name");
+                    Long score = doc.getLong("score");
+                    String odIdField = doc.getId();
+                    String isMyData = odIdField.equals(odId) ? "1" : "0";
+
+                    json.append("{");
+                    json.append("\"ranking\":\"").append(rank).append("\",");
+                    json.append("\"name\":\"").append(escapeJson(name != null ? name : "")).append("\",");
+                    json.append("\"win\":\"").append(score != null ? score : 0).append("\",");
+                    json.append("\"is_my_data\":\"").append(isMyData).append("\"");
+                    json.append("}");
+                    rank++;
+                }
+                json.append("]");
+                onRankingLoaded(json.toString());
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "getRanking failed", e);
+                onRankingLoadFailed();
+            });
+    }
+
+    /**
+     * Get my rank (count users with higher score + 1)
+     * Called from C++
+     */
+    public static void getMyRank(final String odId) {
+        if (db == null || odId == null || odId.isEmpty()) {
+            onMyRankLoadFailed();
+            return;
+        }
+
+        // First get my score
+        db.collection("rankings").document(odId).get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (!documentSnapshot.exists()) {
+                    onMyRankLoaded(0); // Not ranked yet
+                    return;
+                }
+
+                Long myScore = documentSnapshot.getLong("score");
+                if (myScore == null) {
+                    onMyRankLoaded(0);
+                    return;
+                }
+
+                // Count users with higher score
+                AggregateQuery countQuery = db.collection("rankings")
+                    .whereGreaterThan("score", myScore)
+                    .count();
+
+                countQuery.get(AggregateSource.SERVER)
+                    .addOnSuccessListener(aggregateQuerySnapshot -> {
+                        int rank = (int) aggregateQuerySnapshot.getCount() + 1;
+                        onMyRankLoaded(rank);
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e(TAG, "getMyRank count failed", e);
+                        onMyRankLoadFailed();
+                    });
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "getMyRank get doc failed", e);
+                onMyRankLoadFailed();
+            });
+    }
+
+    /**
+     * Save my score
+     * Called from C++
+     * @param odId Document ID (empty string for new user)
+     * @param name Player name
+     * @param score Win count
+     */
+    public static void setMyRank(final String odId, final String name, final int score) {
+        if (db == null) {
+            onScoreSaveFailed();
+            return;
+        }
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("name", name);
+        data.put("score", score);
+        data.put("updatedAt", com.google.firebase.Timestamp.now());
+
+        DocumentReference docRef;
+        if (odId == null || odId.isEmpty()) {
+            // New user - create new document
+            docRef = db.collection("rankings").document();
+        } else {
+            // Existing user - update document
+            docRef = db.collection("rankings").document(odId);
+        }
+
+        docRef.set(data, SetOptions.merge())
+            .addOnSuccessListener(aVoid -> {
+                onScoreSaved(docRef.getId());
+            })
+            .addOnFailureListener(e -> {
+                Log.e(TAG, "setMyRank failed", e);
+                onScoreSaveFailed();
+            });
+    }
+
+    private static String escapeJson(String s) {
+        if (s == null) return "";
+        return s.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 }
