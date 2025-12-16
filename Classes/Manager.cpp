@@ -304,11 +304,11 @@ void Manager::end()
     
     // TODO: ランキング機能実装後に復活させる
     // int playerLoseCount = playerLoseCount0 + playerLoseCount1 + playerLoseCount2;
-    // NetRanking::getNetRanking()->setMyRank(global_user_id, global_user_name, playerWinCount, playerLoseCount,
-    //                                        [](int user_id) {
-    //                                            if (global_user_id == 0) {
-    //                                                global_user_id = user_id;
-    //                                                UserDefault::getInstance()->setIntegerForKey("userId", global_user_id);
+    // NetRanking::getNetRanking()->setMyRank(global_user_od_id, global_user_name, playerWinCount, playerLoseCount,
+    //                                        [](std::string odId) {
+    //                                            if (global_user_od_id.empty()) {
+    //                                                global_user_od_id = odId;
+    //                                                UserDefault::getInstance()->setStringForKey("userOdId", global_user_od_id);
     //                                            }
     //                                        });
     

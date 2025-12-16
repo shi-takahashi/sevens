@@ -14,5 +14,5 @@ int config_use_joker;
 int config_use_tunnel;
 int config_use_net;
 
-int global_user_id;
+std::string global_user_od_id;  // Firestore Document ID
 std::string global_user_name;

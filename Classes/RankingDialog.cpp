@@ -41,7 +41,7 @@ bool RankingDialog::init()
     bgSprite->addChild(closeButton);
     
     NetRanking::getNetRanking()->getRanking(
-                                            global_user_id,
+                                            global_user_od_id,
                                             [this, bgSprite](std::vector<std::map<std::string, std::string>> ranking) {
                                                 int i = 0;
                                                 for (std::map<std::string, std::string> map : ranking) {

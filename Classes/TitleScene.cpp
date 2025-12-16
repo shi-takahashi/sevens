@@ -26,7 +26,7 @@ bool TitleScene::init()
     config_use_tunnel = UserDefault::getInstance()->getIntegerForKey("useTunnel", SETTING_NO_USE);
     config_use_net = UserDefault::getInstance()->getIntegerForKey("useNet", SETTING_USE);
     
-    global_user_id = UserDefault::getInstance()->getIntegerForKey("userId", USER_ID_NONE);
+    global_user_od_id = UserDefault::getInstance()->getStringForKey("userOdId", "");
     global_user_name = UserDefault::getInstance()->getStringForKey("userName");
     
     Size visibleSize { Director::getInstance()->getVisibleSize() };

@@ -113,7 +113,7 @@ bool ReportDialog::init()
     // ranking_label->setColor(Color3B(255, 255, 255));
     // bgSprite->addChild(ranking_label, 0);
     //
-    // NetRanking::getNetRanking()->getMyRank(global_user_id,
+    // NetRanking::getNetRanking()->getMyRank(global_user_od_id,
     //                                        [bgSprite, ranking_label](int ranking) {
     //                                            ranking_label->setString(StringUtils::format("%d位", ranking));
     //                                            bgSprite->setVisible(true);

@@ -3,16 +3,18 @@
 //  Sevens
 //
 //  Created by shinnichirou.takahashi on 2018/10/16.
-//
+//  Modified for Firebase Firestore integration
 //
 
 #include "Common.h"
 #include "NetRanking.h"
-#include "network/HttpClient.h"
 #include "picojson.h"
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+#include "platform/android/jni/JniHelper.h"
+#endif
+
 USING_NS_CC;
-using namespace cocos2d::network;
 
 NetRanking* NetRanking::net_ranking = nullptr;
 
@@ -31,114 +33,9 @@ bool NetRanking::init()
     return true;
 }
 
-void NetRanking::getRanking(int user_id, std::function<void(std::vector<std::map<std::string, std::string>> ranking_data)> success, std::function<void(void)> cancel)
-{
-    if (config_use_net == SETTING_OFF) {
-        if (cancel) {
-            cancel();
-        }
-        return;
-    }
-    
-    auto request = new HttpRequest;
-    request->setUrl("https://x723.xsrv.jp/sevens/get_ranking.php");
-    request->setRequestType(HttpRequest::Type::POST);
-    request->setResponseCallback([this, success, cancel](HttpClient* client, HttpResponse* response) {
-//        log("responseCode:%ld %s", response->getResponseCode(), response->getHttpRequest()->getUrl());
-        if (response->isSucceed()) {
-            // json.
-            std::vector<char> *buffer = response->getResponseData();
-            const char *data = reinterpret_cast<char *>(&(buffer->front()));
-            picojson::value v;
-            std::string error;
-            picojson::parse(v, data, data + strlen(data), &error);
-            if (error.empty())
-            {
-                std::vector<std::map<std::string, std::string>> ranking_data = {};
-                picojson::array& array = v.get<picojson::array>();
-                for (picojson::array::iterator it = array.begin(); it != array.end(); it++)
-                {
-                    picojson::object& obj = it->get<picojson::object>();
-                    std::string &ranking = obj["ranking"].get<std::string>();
-                    std::string &name = obj["name"].get<std::string>();
-                    std::string &win = obj["win"].get<std::string>();
-                    std::string &is_my_data = obj["is_my_data"].get<std::string>();
-                    std::map<std::string, std::string> map = {
-                        {"ranking",     ranking},
-                        {"name",        name},
-                        {"win",         win},
-                        {"is_my_data",  is_my_data},
-                    };
-                    ranking_data.emplace_back(map);
-                }
-                success(ranking_data);
-            }
-        }
-        else {
-//            log("HttpRequest failed");
-            if (cancel) {
-                cancel();
-            }
-        }
-    });
-    
-    char dataStr[256];
-    sprintf(dataStr, "id=%d", user_id);
-    std::string data = std::string(dataStr);
-    const char* postData = data.c_str();
-    request->setRequestData(postData, strlen(postData));
-    auto client = HttpClient::getInstance();
-    client->enableCookies(NULL);
-    client->send(request);
-}
-
-void NetRanking::getMyRank(int user_id, std::function<void(int ranking)> success, std::function<void(void)> cancel)
-{
-    if (config_use_net == SETTING_OFF || user_id == 0) {
-        if (cancel) {
-            cancel();
-        }
-        return;
-    }
-    
-    auto request = new HttpRequest;
-    request->setUrl("https://x723.xsrv.jp/sevens/get_my_rank.php");
-    request->setRequestType(HttpRequest::Type::POST);
-    request->setResponseCallback([this, success, cancel](HttpClient* client, HttpResponse* response) {
-//        log("responseCode:%ld %s", response->getResponseCode(), response->getHttpRequest()->getUrl());
-        if (response->isSucceed()) {
-            // json.
-            std::vector<char> *buffer = response->getResponseData();
-            const char *data = reinterpret_cast<char *>(&(buffer->front()));
-            picojson::value v;
-            std::string error;
-            picojson::parse(v, data, data + strlen(data), &error);
-            if (error.empty())
-            {
-                picojson::object& obj = v.get<picojson::object>();
-                std::string &ranking = obj["ranking"].get<std::string>();
-                success(atoi(ranking.c_str()));
-            }
-        }
-        else {
-//            log("HttpRequest failed");
-            if (cancel) {
-                cancel();
-            }
-        }
-    });
-
-    char dataStr[256];
-    sprintf(dataStr, "id=%d", user_id);
-    std::string data = std::string(dataStr);
-    const char* postData = data.c_str();
-    request->setRequestData(postData, strlen(postData));
-    auto client = HttpClient::getInstance();
-    client->enableCookies(NULL);
-    client->send(request);
-}
-
-void NetRanking::setMyRank(int id, std::string name, int win, int lose, std::function<void(int id)> success, std::function<void(void)> cancel)
+void NetRanking::getRanking(const std::string& odId,
+                            std::function<void(std::vector<std::map<std::string, std::string>> ranking_data)> success,
+                            std::function<void(void)> cancel)
 {
     if (config_use_net == SETTING_OFF) {
         if (cancel) {
@@ -147,43 +44,204 @@ void NetRanking::setMyRank(int id, std::string name, int win, int lose, std::fun
         return;
     }
 
-    auto request = new HttpRequest;
-    request->setUrl("https://x723.xsrv.jp/sevens/set_my_rank.php");
-    request->setRequestType(HttpRequest::Type::POST);
-    request->setResponseCallback([this, success, cancel](HttpClient* client, HttpResponse* response) {
-//        log("responseCode:%ld %s", response->getResponseCode(), response->getHttpRequest()->getUrl());
-        if (response->isSucceed()) {
-            // json.
-            std::vector<char> *buffer = response->getResponseData();
-            const char *data = reinterpret_cast<char *>(&(buffer->front()));
-            picojson::value v;
-            std::string error;
-            picojson::parse(v, data, data + strlen(data), &error);
-            if (error.empty())
-            {
-                picojson::object& obj = v.get<picojson::object>();
-                std::string &id = obj["id"].get<std::string>();
-                success(atoi(id.c_str()));
-            }
+    _getRankingSuccessCallback = success;
+    _getRankingCancelCallback = cancel;
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    JniHelper::callStaticVoidMethod("org/cocos2dx/cpp/AppActivity", "getRanking", odId);
+#else
+    // For other platforms, just call cancel
+    if (cancel) {
+        cancel();
+    }
+#endif
+}
+
+void NetRanking::getMyRank(const std::string& odId,
+                           std::function<void(int ranking)> success,
+                           std::function<void(void)> cancel)
+{
+    if (config_use_net == SETTING_OFF || odId.empty()) {
+        if (cancel) {
+            cancel();
         }
-        else {
-//            log("HttpRequest failed");
-            if (cancel) {
-                cancel();
-            }
+        return;
+    }
+
+    _getMyRankSuccessCallback = success;
+    _getMyRankCancelCallback = cancel;
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    JniHelper::callStaticVoidMethod("org/cocos2dx/cpp/AppActivity", "getMyRank", odId);
+#else
+    if (cancel) {
+        cancel();
+    }
+#endif
+}
+
+void NetRanking::setMyRank(const std::string& odId,
+                           const std::string& name,
+                           int win,
+                           int lose,
+                           std::function<void(std::string odId)> success,
+                           std::function<void(void)> cancel)
+{
+    if (config_use_net == SETTING_OFF) {
+        if (cancel) {
+            cancel();
+        }
+        return;
+    }
+
+    _setMyRankSuccessCallback = success;
+    _setMyRankCancelCallback = cancel;
+
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+    JniHelper::callStaticVoidMethod("org/cocos2dx/cpp/AppActivity", "setMyRank", odId, name, win);
+#else
+    if (cancel) {
+        cancel();
+    }
+#endif
+}
+
+// Callbacks from Java
+
+void NetRanking::onRankingLoaded(const std::string& jsonData)
+{
+    if (!_getRankingSuccessCallback) return;
+
+    std::vector<std::map<std::string, std::string>> ranking_data;
+
+    picojson::value v;
+    std::string error;
+    picojson::parse(v, jsonData.begin(), jsonData.end(), &error);
+
+    if (error.empty() && v.is<picojson::array>())
+    {
+        picojson::array& array = v.get<picojson::array>();
+        for (auto& item : array)
+        {
+            if (!item.is<picojson::object>()) continue;
+            picojson::object& obj = item.get<picojson::object>();
+
+            std::map<std::string, std::string> map;
+            map["ranking"] = obj["ranking"].is<std::string>() ? obj["ranking"].get<std::string>() : "";
+            map["name"] = obj["name"].is<std::string>() ? obj["name"].get<std::string>() : "";
+            map["win"] = obj["win"].is<std::string>() ? obj["win"].get<std::string>() : "";
+            map["is_my_data"] = obj["is_my_data"].is<std::string>() ? obj["is_my_data"].get<std::string>() : "0";
+
+            ranking_data.emplace_back(map);
+        }
+    }
+
+    // Schedule callback on main thread
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([this, ranking_data]() {
+        if (_getRankingSuccessCallback) {
+            _getRankingSuccessCallback(ranking_data);
+            _getRankingSuccessCallback = nullptr;
+            _getRankingCancelCallback = nullptr;
         }
     });
-    
-    char dataStr[256];
-    if (id > 0) {
-        sprintf(dataStr, "id=%d&name=%s&win=%d&lose=%d", id, name.c_str(), win, lose);
-    } else {
-        sprintf(dataStr, "name=%s&win=%d&lose=%d", name.c_str(), win, lose);
-    }
-    std::string data = std::string(dataStr);
-    const char* postData = data.c_str();
-    request->setRequestData(postData, strlen(postData));
-    auto client = HttpClient::getInstance();
-    client->enableCookies(NULL);
-    client->send(request);
 }
+
+void NetRanking::onRankingLoadFailed()
+{
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([this]() {
+        if (_getRankingCancelCallback) {
+            _getRankingCancelCallback();
+        }
+        _getRankingSuccessCallback = nullptr;
+        _getRankingCancelCallback = nullptr;
+    });
+}
+
+void NetRanking::onMyRankLoaded(int rank)
+{
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([this, rank]() {
+        if (_getMyRankSuccessCallback) {
+            _getMyRankSuccessCallback(rank);
+        }
+        _getMyRankSuccessCallback = nullptr;
+        _getMyRankCancelCallback = nullptr;
+    });
+}
+
+void NetRanking::onMyRankLoadFailed()
+{
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([this]() {
+        if (_getMyRankCancelCallback) {
+            _getMyRankCancelCallback();
+        }
+        _getMyRankSuccessCallback = nullptr;
+        _getMyRankCancelCallback = nullptr;
+    });
+}
+
+void NetRanking::onScoreSaved(const std::string& odId)
+{
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([this, odId]() {
+        if (_setMyRankSuccessCallback) {
+            _setMyRankSuccessCallback(odId);
+        }
+        _setMyRankSuccessCallback = nullptr;
+        _setMyRankCancelCallback = nullptr;
+    });
+}
+
+void NetRanking::onScoreSaveFailed()
+{
+    Director::getInstance()->getScheduler()->performFunctionInCocosThread([this]() {
+        if (_setMyRankCancelCallback) {
+            _setMyRankCancelCallback();
+        }
+        _setMyRankSuccessCallback = nullptr;
+        _setMyRankCancelCallback = nullptr;
+    });
+}
+
+// JNI callbacks from Java
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
+extern "C" {
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_onRankingLoaded(JNIEnv* env, jclass clazz, jstring jsonData)
+{
+    const char* jsonDataStr = env->GetStringUTFChars(jsonData, nullptr);
+    std::string data(jsonDataStr);
+    env->ReleaseStringUTFChars(jsonData, jsonDataStr);
+
+    NetRanking::getNetRanking()->onRankingLoaded(data);
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_onRankingLoadFailed(JNIEnv* env, jclass clazz)
+{
+    NetRanking::getNetRanking()->onRankingLoadFailed();
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_onMyRankLoaded(JNIEnv* env, jclass clazz, jint rank)
+{
+    NetRanking::getNetRanking()->onMyRankLoaded(static_cast<int>(rank));
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_onMyRankLoadFailed(JNIEnv* env, jclass clazz)
+{
+    NetRanking::getNetRanking()->onMyRankLoadFailed();
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_onScoreSaved(JNIEnv* env, jclass clazz, jstring odId)
+{
+    const char* odIdStr = env->GetStringUTFChars(odId, nullptr);
+    std::string id(odIdStr);
+    env->ReleaseStringUTFChars(odId, odIdStr);
+
+    NetRanking::getNetRanking()->onScoreSaved(id);
+}
+
+JNIEXPORT void JNICALL Java_org_cocos2dx_cpp_AppActivity_onScoreSaveFailed(JNIEnv* env, jclass clazz)
+{
+    NetRanking::getNetRanking()->onScoreSaveFailed();
+}
+
+}
+#endif

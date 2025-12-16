@@ -13,7 +13,6 @@
 #define SETTING_NO_USE 0
 #define SETTING_USE 1
 
-#define USER_ID_NONE 0
 #define USER_NAME_NONE "unknown"
 
 #include <string>
@@ -24,7 +23,7 @@ extern int config_use_joker;
 extern int config_use_tunnel;
 extern int config_use_net;
 
-extern int global_user_id;
+extern std::string global_user_od_id;  // Firestore Document ID
 extern std::string global_user_name;
 
 constexpr int CARD_WIDTH { 200 };
