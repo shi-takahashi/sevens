@@ -51,34 +51,33 @@ bool RankingDialog::init()
     
     NetRanking::getNetRanking()->getRanking(
                                             global_user_od_id,
-                                            [this, bgSprite](std::vector<std::map<std::string, std::string>> ranking) {
-                                                int i = 0;
+                                            [bgSprite](const std::vector<std::map<std::string, std::string>>& ranking) {
+                                                float i = 0;
                                                 for (std::map<std::string, std::string> map : ranking) {
-//                                                    log("ranking:%s name:%s win:%s", map["ranking"].c_str(), map["name"].c_str(), map["win"].c_str());
                                                     i++;
-                                                    Color3B color = Color3B(255, 255, 255);
+                                                    Color3B color = Color3B(255, 250, 220);  // クリーム色
                                                     if (map["is_my_data"] == "1") {
-                                                        color = Color3B(255, 0, 0);
+                                                        color = Color3B(255, 255, 0);  // 黄色
                                                     }
-                                                    Label* item1 = Label::createWithSystemFont("", "ariel", 34);
+                                                    Label* item1 = Label::createWithSystemFont("", "ariel", 32);
                                                     item1->setAnchorPoint(Vec2(1, 0));
-                                                    item1->setPosition(Vec2(150, 425 - i * 42));
+                                                    item1->setPosition(Vec2(125, 425 - i * 42));
                                                     item1->setColor(color);
-                                                    item1->setString((map["ranking"] + "位").c_str());
+                                                    item1->setString(map["ranking"] + "位");
                                                     bgSprite->addChild(item1, 0);
                                                     
-                                                    Label* item2 = Label::createWithSystemFont("", "ariel", 34);
+                                                    Label* item2 = Label::createWithSystemFont("", "ariel", 32);
                                                     item2->setAnchorPoint(Vec2(0, 0));
-                                                    item2->setPosition(Vec2(200, 425 - i * 42));
+                                                    item2->setPosition(Vec2(175, 425 - i * 42));
                                                     item2->setColor(color);
-                                                    item2->setString(map["name"].c_str());
+                                                    item2->setString(map["name"]);
                                                     bgSprite->addChild(item2, 0);
                                                     
-                                                    Label* item3 = Label::createWithSystemFont("", "ariel", 34);
+                                                    Label* item3 = Label::createWithSystemFont("", "ariel", 32);
                                                     item3->setAnchorPoint(Vec2(1, 0));
-                                                    item3->setPosition(Vec2(650, 425 - i * 42));
+                                                    item3->setPosition(Vec2(675, 425 - i * 42));
                                                     item3->setColor(color);
-                                                    item3->setString((map["win"] + "勝").c_str());
+                                                    item3->setString(map["win"] + "勝");
                                                     bgSprite->addChild(item3, 0);
                                                     
                                                     bgSprite->setVisible(true);
@@ -88,7 +87,7 @@ bool RankingDialog::init()
                                                 Label* item1 = Label::createWithSystemFont("", "ariel", 34);
                                                 item1->setAnchorPoint(Vec2(0, 0));
                                                 item1->setPosition(Vec2(150, 215));
-                                                item1->setColor(Color3B(255, 255, 255));
+                                                item1->setColor(Color3B(255, 250, 220));  // クリーム色
                                                 item1->setString("データを取得できませんでした");
                                                 bgSprite->addChild(item1, 0);
                                                 bgSprite->setVisible(true);
@@ -115,7 +114,7 @@ void RankingDialog::buttonTouched(Ref* pSender, ui::Widget::TouchEventType type)
     {
         case ui::Widget::TouchEventType::ENDED:
         {
-            ui::Button* button {static_cast<ui::Button*>(pSender)};
+            ui::Button* button {dynamic_cast<ui::Button*>(pSender)};
             switch (button->getTag())
             {
                 case CLOSE_BUTTON_TAG:
