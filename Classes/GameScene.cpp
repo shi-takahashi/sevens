@@ -85,34 +85,41 @@ GameScene::GameScene()
     this->background_image->setPosition(Director::getInstance()->getVisibleSize() / 2);
     CC_SAFE_RETAIN(this->background_image);
 
-    // 中断ボタン（左下に配置）
-    this->pause_button = Node::create();
-    this->pause_button->setContentSize(Size(44, 44));
-    this->pause_button->setPosition(Vec2(110.0f, 28.0f));
+    // メニューボタン（左下に配置）
+    this->menu_button = Node::create();
+    this->menu_button->setContentSize(Size(44, 44));
+    this->menu_button->setPosition(Vec2(28.0f, 28.0f));
 
     // ボタン背景とアイコンを描画
-    this->pause_button_icon = DrawNode::create();
+    this->menu_button_icon = DrawNode::create();
     float radius = 20.0f;
     // 背景の円（半透明の暗い色）
-    this->pause_button_icon->drawSolidCircle(Vec2(0, 0), radius, 0, 32, Color4F(0.2f, 0.2f, 0.3f, 0.8f));
+    this->menu_button_icon->drawSolidCircle(Vec2(0, 0), radius, 0, 32, Color4F(0.2f, 0.2f, 0.3f, 0.8f));
     // 円の枠線
-    this->pause_button_icon->drawCircle(Vec2(0, 0), radius, 0, 32, false, Color4F(0.8f, 0.8f, 0.8f, 1.0f));
-    // 一時停止アイコン（||）白色
+    this->menu_button_icon->drawCircle(Vec2(0, 0), radius, 0, 32, false, Color4F(0.8f, 0.8f, 0.8f, 1.0f));
+    // ハンバーガーメニューアイコン（≡）白色
     Color4F iconColor = Color4F::WHITE;
-    float barWidth = 5.0f;
-    float barHeight = 16.0f;
-    float gap = 4.0f;
-    this->pause_button_icon->drawSolidRect(
-        Vec2(-gap - barWidth, -barHeight / 2),
-        Vec2(-gap, barHeight / 2),
+    float lineWidth = 14.0f;
+    float lineHeight = 2.5f;
+    float lineGap = 5.0f;
+    // 上の線
+    this->menu_button_icon->drawSolidRect(
+        Vec2(-lineWidth / 2, lineGap),
+        Vec2(lineWidth / 2, lineGap + lineHeight),
         iconColor);
-    this->pause_button_icon->drawSolidRect(
-        Vec2(gap, -barHeight / 2),
-        Vec2(gap + barWidth, barHeight / 2),
+    // 中央の線
+    this->menu_button_icon->drawSolidRect(
+        Vec2(-lineWidth / 2, -lineHeight / 2),
+        Vec2(lineWidth / 2, lineHeight / 2),
         iconColor);
-    this->pause_button->addChild(this->pause_button_icon);
+    // 下の線
+    this->menu_button_icon->drawSolidRect(
+        Vec2(-lineWidth / 2, -lineGap - lineHeight),
+        Vec2(lineWidth / 2, -lineGap),
+        iconColor);
+    this->menu_button->addChild(this->menu_button_icon);
 
-    CC_SAFE_RETAIN(this->pause_button);
+    CC_SAFE_RETAIN(this->menu_button);
     
     // 枠線
     createFrameLine(0, Vec2(226.0f, 6.0f), 1048.0f, 216.0f);
@@ -175,7 +182,7 @@ GameScene::~GameScene()
     }
 
     CC_SAFE_RELEASE_NULL(this->background_image);
-    CC_SAFE_RELEASE_NULL(this->pause_button);
+    CC_SAFE_RELEASE_NULL(this->menu_button);
 
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 4; j++) {
@@ -246,21 +253,21 @@ bool GameScene::init()
         }
     }
 
-    //<! 中断ボタン
-    addChild(this->pause_button);
-    auto pauseListener = EventListenerTouchOneByOne::create();
-    pauseListener->setSwallowTouches(true);
-    pauseListener->onTouchBegan = [this](Touch* touch, Event* event) {
-        Vec2 locationInNode = this->pause_button->convertToNodeSpace(touch->getLocation());
-        Size size = this->pause_button->getContentSize();
+    //<! メニューボタン
+    addChild(this->menu_button);
+    auto menuListener = EventListenerTouchOneByOne::create();
+    menuListener->setSwallowTouches(true);
+    menuListener->onTouchBegan = [this](Touch* touch, Event* event) {
+        Vec2 locationInNode = this->menu_button->convertToNodeSpace(touch->getLocation());
+        Size size = this->menu_button->getContentSize();
         Rect rect = Rect(-size.width / 2, -size.height / 2, size.width, size.height);
         if (rect.containsPoint(locationInNode)) {
-            this->onPauseButtonTouched(touch, event);
+            this->onMenuButtonTouched(touch, event);
             return true;
         }
         return false;
     };
-    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(pauseListener, this->pause_button);
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(menuListener, this->menu_button);
 
     return true;
 }
@@ -427,7 +434,7 @@ void GameScene::touchEnd()
 /**
  * パスボタンをタッチした時に呼ばれる処理
  */
-void GameScene::onPassButtonTouched(Ref* pSender, ui::Widget::TouchEventType type)
+void GameScene::onPassButtonTouched(Ref* pSender, ui::Widget::TouchEventType type) const
 {
     if (!this->player_character->is_touch_enabled) {
         return;
@@ -463,7 +470,7 @@ void GameScene::showResultDialog(std::string text, std::string text_right)
         new UIDialogButton("タイトル画面に戻る", action, 2),
         new UIDialogButton("ゲームを終了する", action, 3),
     };
-    auto* dialog = UIDialog::create("", std::move(text), std::move(text_right), buttons);
+    auto* dialog= UIDialog::create("", std::move(text), std::move(text_right), buttons);
     addChild(dialog, 100, 100);
     dialog->setGlobalZOrder(100);
 }
@@ -557,20 +564,20 @@ void GameScene::resumeNext()
 }
 
 /**
- * 中断ボタンをタッチした時に呼ばれる処理
+ * メニューボタンをタッチした時に呼ばれる処理
  */
-void GameScene::onPauseButtonTouched(Touch* touch, Event* event)
+void GameScene::onMenuButtonTouched(Touch* touch, Event* event)
 {
     this->manager->pause();
-    showPauseDialog();
+    showMenuDialog();
 }
 
 /**
- * 中断ダイアログ
+ * メニューダイアログ
  */
-void GameScene::showPauseDialog()
+void GameScene::showMenuDialog()
 {
-    cocos2d::ccMenuCallback action = CC_CALLBACK_1(GameScene::pauseDialogCallback, this);
+    cocos2d::ccMenuCallback action = CC_CALLBACK_1(GameScene::menuDialogCallback, this);
     std::vector<UIDialogButton*> buttons = {
         new UIDialogButton("ゲームを再開する", action, 1),
         new UIDialogButton("タイトル画面に戻る", action, 2),
@@ -582,9 +589,9 @@ void GameScene::showPauseDialog()
 }
 
 /**
- * 中断ダイアログコールバック
+ * メニューダイアログコールバック
  */
-void GameScene::pauseDialogCallback(Ref* Sender)
+void GameScene::menuDialogCallback(Ref* Sender)
 {
     switch(((MenuItem*)Sender)->getTag())
     {

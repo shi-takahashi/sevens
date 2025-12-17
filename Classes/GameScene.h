@@ -39,15 +39,15 @@ private:
     void createFrameLine(int line_no, Vec2 point, float width, float height);
     bool touchBegan(Vec2 pos);
     void touchEnd();
-    void onPassButtonTouched(Ref* pSender, ui::Widget::TouchEventType type);
+    void onPassButtonTouched(Ref* pSender, ui::Widget::TouchEventType type) const;
     void resultDialogCallback(Ref* Sender);
 
-    // 中断ボタン
-    Node* pause_button;
-    DrawNode* pause_button_icon;
-    void onPauseButtonTouched(Touch* touch, Event* event);
-    void showPauseDialog();
-    void pauseDialogCallback(Ref* Sender);
+    // メニューボタン
+    Node* menu_button;
+    DrawNode* menu_button_icon;
+    void onMenuButtonTouched(Touch* touch, Event* event);
+    void showMenuDialog();
+    void menuDialogCallback(Ref* Sender);
 };
 
 #endif //SEVENS_GAMESCENE_H

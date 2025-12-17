@@ -241,13 +241,12 @@ bool Manager::advanceNextCharacter()
 
 void Manager::migrateControlToNext()
 {
-    // 一時停止中なら処理を止める
-    if (this->is_paused) {
-        return;
-    }
-
     if (this->next_charcter->isPlayer())
     {
+        // プレイヤーのターンで一時停止中なら止める
+        if (this->is_paused) {
+            return;
+        }
         (static_cast<PlayerCharacter*>(this->next_charcter))->setTouchEnabled(true);
     }
     else
@@ -356,7 +355,7 @@ void Manager::end()
     GameScene::getGameScene()->showResultDialog(text, text_right);
 }
 
-Card* Manager::findTargetMarkCard(Mark mark, int* number_list, size_t number_list_size)
+Card* Manager::findTargetMarkCard(Mark mark, const int* number_list, size_t number_list_size)
 {
     Card* ret = nullptr;
     

@@ -37,7 +37,7 @@ private:
     std::vector<Character*> characters;
     Character* next_charcter;
     
-    Card* findTargetMarkCard(Mark, int*, size_t);
+    Card* findTargetMarkCard(Mark, const int*, size_t);
     bool isHighLink(Mark);
     bool isLowLink(Mark);
     void updateCardData(Character*, Command, Card*);
