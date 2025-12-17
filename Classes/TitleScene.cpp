@@ -36,7 +36,7 @@ bool TitleScene::init()
     this->addChild(bgSprite);
 
     Sprite* logoSprite { Sprite::create("title_logo.png") };
-    logoSprite->setPosition(Vec2(640.0f, 450.0f));
+    logoSprite->setPosition(Vec2(640.0f, 400.0f));
     this->addChild(logoSprite);
 
     ui::Button* startButton { ui::Button::create("title_start.png") };
