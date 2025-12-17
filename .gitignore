@@ -7,3 +7,16 @@ proj.android/app/release/Sevens-release.apk
 proj.android/.gradle/
 proj.linux/
 proj.win32/
+
+# IDE設定
+proj.android/.idea/
+*.iml
+
+# macOS
+.DS_Store
+
+# ローカル設定
+proj.android/local.properties
+
+# ヒープダンプ
+*.hprof
