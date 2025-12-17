@@ -49,30 +49,30 @@ bool ReportDialog::init()
     closeButton->setTag(CLOSE_BUTTON_TAG);
     bgSprite->addChild(closeButton);
     
-    Label* item1 = Label::createWithSystemFont("", "ariel", 40);
+    Label* item1 = Label::createWithSystemFont("", "ariel", 32);
     item1->setAnchorPoint(Vec2(0, 0));
-    item1->setPosition(Vec2(50, 350));
+    item1->setPosition(Vec2(30, 350));
     item1->setColor(Color3B(255, 250, 220));
     item1->setString("通算成績");
     bgSprite->addChild(item1, 0);
     
-    Label* item2 = Label::createWithSystemFont("", "ariel", 40);
+    Label* item2 = Label::createWithSystemFont("", "ariel", 32);
     item2->setAnchorPoint(Vec2(0, 0));
-    item2->setPosition(Vec2(50, 250));
+    item2->setPosition(Vec2(30, 250));
     item2->setColor(Color3B(255, 250, 220));
     item2->setString("通算勝率");
     bgSprite->addChild(item2, 0);
     
-    Label* item3 = Label::createWithSystemFont("", "ariel", 40);
+    Label* item3 = Label::createWithSystemFont("", "ariel", 32);
     item3->setAnchorPoint(Vec2(0, 0));
-    item3->setPosition(Vec2(50, 150));
+    item3->setPosition(Vec2(30, 150));
     item3->setColor(Color3B(255, 250, 220));
     item3->setString("連勝記録");
     bgSprite->addChild(item3, 0);
     
-    Label* item4 = Label::createWithSystemFont("", "ariel", 40);
+    Label* item4 = Label::createWithSystemFont("", "ariel", 32);
     item4->setAnchorPoint(Vec2(0, 0));
-    item4->setPosition(Vec2(50, 50));
+    item4->setPosition(Vec2(30, 50));
     item4->setColor(Color3B(255, 250, 220));
     item4->setString("全国順位");
     bgSprite->addChild(item4, 0);
@@ -81,6 +81,7 @@ bool ReportDialog::init()
     int playerLoseCount0 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount0", 0);
     int playerLoseCount1 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount1", 0);
     int playerLoseCount2 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount2", 0);
+
     int playerStreak = UserDefault::getInstance()->getIntegerForKey("playerStreak", 0);
     
     int sumCount = playerWinCount + playerLoseCount0 + playerLoseCount1 + playerLoseCount2;
@@ -90,32 +91,32 @@ bool ReportDialog::init()
         rate = (float)playerWinCount / (float)sumCount * 100;
     }
     
-    Label* result = Label::createWithSystemFont("", "ariel", 40);
+    Label* result = Label::createWithSystemFont("", "ariel", 32);
     result->setAnchorPoint(Vec2(0, 0));
-    result->setPosition(Vec2(250, 350));
+    result->setPosition(Vec2(180, 350));
     result->setColor(Color3B(255, 250, 220));
     result->setString(StringUtils::format("%d勝%d敗(%d/%d/%d/%d)",
                                           playerWinCount, playerLoseCount0 + playerLoseCount1 + playerLoseCount2,
                                           playerWinCount, playerLoseCount0, playerLoseCount1,playerLoseCount2));
     bgSprite->addChild(result, 0);
     
-    Label* percent = Label::createWithSystemFont("", "ariel", 40);
+    Label* percent = Label::createWithSystemFont("", "ariel", 32);
     percent->setAnchorPoint(Vec2(0, 0));
-    percent->setPosition(Vec2(250, 250));
+    percent->setPosition(Vec2(180, 250));
     percent->setColor(Color3B(255, 250, 220));
     percent->setString(StringUtils::format("%.2f", rate) + "%");
     bgSprite->addChild(percent, 0);
     
-    Label* streak = Label::createWithSystemFont("", "ariel", 40);
+    Label* streak = Label::createWithSystemFont("", "ariel", 32);
     streak->setAnchorPoint(Vec2(0, 0));
-    streak->setPosition(Vec2(250, 150));
+    streak->setPosition(Vec2(180, 150));
     streak->setColor(Color3B(255, 250, 220));
     streak->setString(StringUtils::format("%d", playerStreak));
     bgSprite->addChild(streak, 0);
     
-    Label* ranking_label = Label::createWithSystemFont("", "ariel", 40);
+    Label* ranking_label = Label::createWithSystemFont("", "ariel", 32);
     ranking_label->setAnchorPoint(Vec2(0, 0));
-    ranking_label->setPosition(Vec2(250, 50));
+    ranking_label->setPosition(Vec2(180, 50));
     ranking_label->setColor(Color3B(255, 250, 220));
     bgSprite->addChild(ranking_label, 0);
 
