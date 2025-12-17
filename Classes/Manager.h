@@ -16,7 +16,8 @@ class Manager : public cocos2d::Ref
 {
 public:
     std::vector<Card*> table_cards;
-    
+    bool is_paused = false;
+
     static Manager* getManager();
     Manager() {};
     ~Manager();
@@ -28,6 +29,8 @@ public:
     void end();
     std::vector<Card*> askTargetCards();
     std::vector<Card*> askTargetCardsWithJoker();
+    void pause();
+    void resume();
     
 private:
     static Manager* manager;

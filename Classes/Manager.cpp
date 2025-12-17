@@ -241,6 +241,11 @@ bool Manager::advanceNextCharacter()
 
 void Manager::migrateControlToNext()
 {
+    // 一時停止中なら処理を止める
+    if (this->is_paused) {
+        return;
+    }
+
     if (this->next_charcter->isPlayer())
     {
         (static_cast<PlayerCharacter*>(this->next_charcter))->setTouchEnabled(true);
@@ -249,6 +254,17 @@ void Manager::migrateControlToNext()
     {
         this->next_charcter->process(Command::PUT_NORMAL);
     }
+}
+
+void Manager::pause()
+{
+    this->is_paused = true;
+}
+
+void Manager::resume()
+{
+    this->is_paused = false;
+    this->migrateControlToNext();
 }
 
 void Manager::end()

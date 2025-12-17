@@ -4,6 +4,8 @@
 
 #include "audio/include/AudioEngine.h"
 #include "GameScene.h"
+
+#include <utility>
 #include "AI1.h"
 #include "AI2.h"
 #include "AI3.h"
@@ -82,6 +84,35 @@ GameScene::GameScene()
     this->background_image = Sprite::create("bg.png");
     this->background_image->setPosition(Director::getInstance()->getVisibleSize() / 2);
     CC_SAFE_RETAIN(this->background_image);
+
+    // 中断ボタン（左下に配置）
+    this->pause_button = Node::create();
+    this->pause_button->setContentSize(Size(44, 44));
+    this->pause_button->setPosition(Vec2(110.0f, 28.0f));
+
+    // ボタン背景とアイコンを描画
+    this->pause_button_icon = DrawNode::create();
+    float radius = 20.0f;
+    // 背景の円（半透明の暗い色）
+    this->pause_button_icon->drawSolidCircle(Vec2(0, 0), radius, 0, 32, Color4F(0.2f, 0.2f, 0.3f, 0.8f));
+    // 円の枠線
+    this->pause_button_icon->drawCircle(Vec2(0, 0), radius, 0, 32, false, Color4F(0.8f, 0.8f, 0.8f, 1.0f));
+    // 一時停止アイコン（||）白色
+    Color4F iconColor = Color4F::WHITE;
+    float barWidth = 5.0f;
+    float barHeight = 16.0f;
+    float gap = 4.0f;
+    this->pause_button_icon->drawSolidRect(
+        Vec2(-gap - barWidth, -barHeight / 2),
+        Vec2(-gap, barHeight / 2),
+        iconColor);
+    this->pause_button_icon->drawSolidRect(
+        Vec2(gap, -barHeight / 2),
+        Vec2(gap + barWidth, barHeight / 2),
+        iconColor);
+    this->pause_button->addChild(this->pause_button_icon);
+
+    CC_SAFE_RETAIN(this->pause_button);
     
     // 枠線
     createFrameLine(0, Vec2(226.0f, 6.0f), 1048.0f, 216.0f);
@@ -142,15 +173,16 @@ GameScene::~GameScene()
     for (Character* charcter : this->characters) {
         CC_SAFE_DELETE(charcter);
     }
-    
+
     CC_SAFE_RELEASE_NULL(this->background_image);
-    
+    CC_SAFE_RELEASE_NULL(this->pause_button);
+
     for (int i = 0; i < 5; i++) {
         for (int j = 0; j < 4; j++) {
             CC_SAFE_RELEASE_NULL(this->frame_lines[i][j]);
         }
     }
-    
+
     for (Card* card : this->game_cards) {
         CC_SAFE_DELETE(card);
     }
@@ -213,7 +245,23 @@ bool GameScene::init()
             cards.at(j)->card_image->setGlobalZOrder(j);
         }
     }
-    
+
+    //<! 中断ボタン
+    addChild(this->pause_button);
+    auto pauseListener = EventListenerTouchOneByOne::create();
+    pauseListener->setSwallowTouches(true);
+    pauseListener->onTouchBegan = [this](Touch* touch, Event* event) {
+        Vec2 locationInNode = this->pause_button->convertToNodeSpace(touch->getLocation());
+        Size size = this->pause_button->getContentSize();
+        Rect rect = Rect(-size.width / 2, -size.height / 2, size.width, size.height);
+        if (rect.containsPoint(locationInNode)) {
+            this->onPauseButtonTouched(touch, event);
+            return true;
+        }
+        return false;
+    };
+    this->getEventDispatcher()->addEventListenerWithSceneGraphPriority(pauseListener, this->pause_button);
+
     return true;
 }
 
@@ -411,11 +459,11 @@ void GameScene::showResultDialog(std::string text, std::string text_right)
 {
     cocos2d::ccMenuCallback action = CC_CALLBACK_1(GameScene::resultDialogCallback, this);
     std::vector<UIDialogButton*> buttons = {
-        new UIDialogButton("つづける", action, 1),
-        new UIDialogButton("もどる", action, 2),
-        new UIDialogButton("おわる", action, 3),
+        new UIDialogButton("ゲームを続ける", action, 1),
+        new UIDialogButton("タイトル画面に戻る", action, 2),
+        new UIDialogButton("ゲームを終了する", action, 3),
     };
-    auto* dialog = UIDialog::create("", text, text_right, buttons);
+    auto* dialog = UIDialog::create("", std::move(text), std::move(text_right), buttons);
     addChild(dialog, 100, 100);
     dialog->setGlobalZOrder(100);
 }
@@ -501,5 +549,57 @@ void GameScene::resumeNext()
     static_cast<UIDialog*>(this->getChildByTag(100))->close();
     this->init();
     this->manager->start();
+}
+
+/**
+ * 中断ボタンをタッチした時に呼ばれる処理
+ */
+void GameScene::onPauseButtonTouched(Touch* touch, Event* event)
+{
+    this->manager->pause();
+    showPauseDialog();
+}
+
+/**
+ * 中断ダイアログ
+ */
+void GameScene::showPauseDialog()
+{
+    cocos2d::ccMenuCallback action = CC_CALLBACK_1(GameScene::pauseDialogCallback, this);
+    std::vector<UIDialogButton*> buttons = {
+        new UIDialogButton("ゲームを再開する", action, 1),
+        new UIDialogButton("タイトル画面に戻る", action, 2),
+        new UIDialogButton("ゲームを終了する", action, 3),
+    };
+    auto* dialog = UIDialog::create("", "", "", buttons);
+    addChild(dialog, 100, 101);
+    dialog->setGlobalZOrder(100);
+}
+
+/**
+ * 中断ダイアログコールバック
+ */
+void GameScene::pauseDialogCallback(Ref* Sender)
+{
+    switch(((MenuItem*)Sender)->getTag())
+    {
+        case 1: // 再開する
+        {
+            static_cast<UIDialog*>(this->getChildByTag(101))->close();
+            this->manager->resume();
+            break;
+        }
+        case 2: // タイトル画面へ
+        {
+            Scene* scene = TitleScene::createScene();
+            Director::getInstance()->replaceScene(scene);
+            break;
+        }
+        case 3: // 終了
+        {
+            Director::getInstance()->end();
+            break;
+        }
+    }
 }
 

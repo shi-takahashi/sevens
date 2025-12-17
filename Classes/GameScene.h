@@ -41,6 +41,13 @@ private:
     void touchEnd();
     void onPassButtonTouched(Ref* pSender, ui::Widget::TouchEventType type);
     void resultDialogCallback(Ref* Sender);
+
+    // 中断ボタン
+    Node* pause_button;
+    DrawNode* pause_button_icon;
+    void onPauseButtonTouched(Touch* touch, Event* event);
+    void showPauseDialog();
+    void pauseDialogCallback(Ref* Sender);
 };
 
 #endif //SEVENS_GAMESCENE_H

@@ -42,7 +42,7 @@ bool ReportDialog::init()
     bgSprite->setPosition(visibleSize / 2);
     bgSprite->setVisible(true);
     this->addChild(bgSprite);
-    
+
     ui::Button* closeButton { ui::Button::create("close_icon.png") };
     closeButton->setPosition(Vec2(748, 412));
     closeButton->addTouchEventListener(CC_CALLBACK_2(ReportDialog::buttonTouched, this));

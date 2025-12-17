@@ -57,6 +57,11 @@ bool Character::init()
 
 std::vector<Card*> Character::process(Command command, Card* designated_card)
 {
+    // 一時停止中なら処理をスキップ
+    if (Manager::getManager()->is_paused) {
+        return {};
+    }
+
     std::vector<Card*> target_card_list = this->extractCardList(command, designated_card);
     this->runAction(command, target_card_list);
     return target_card_list;
