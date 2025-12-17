@@ -29,6 +29,15 @@ bool ReportDialog::init()
     this->getEventDispatcher()->setPriority(listener,kModalLayerPriority);
     
     Size visibleSize { Director::getInstance()->getVisibleSize() };
+
+    // 半透明オーバーレイ（背景を暗くする）
+    auto overlay = Sprite::create();
+    overlay->setTextureRect(Rect(0, 0, visibleSize.width, visibleSize.height));
+    overlay->setColor(Color3B::BLACK);
+    overlay->setOpacity(160);
+    overlay->setPosition(visibleSize / 2);
+    this->addChild(overlay);
+
     Sprite* bgSprite { Sprite::create("report_bg.png") };
     bgSprite->setPosition(visibleSize / 2);
     bgSprite->setVisible(true);

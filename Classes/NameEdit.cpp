@@ -32,6 +32,15 @@ bool NameEdit::init()
     this->getEventDispatcher()->setPriority(listener,kModalLayerPriority);
     
     Size visibleSize { Director::getInstance()->getVisibleSize() };
+
+    // 半透明オーバーレイ（背景を暗くする）
+    auto overlay = Sprite::create();
+    overlay->setTextureRect(Rect(0, 0, visibleSize.width, visibleSize.height));
+    overlay->setColor(Color3B::BLACK);
+    overlay->setOpacity(160);
+    overlay->setPosition(visibleSize / 2);
+    this->addChild(overlay);
+
     Sprite* bgSprite { Sprite::create("name_edit_bg.png") };
     bgSprite->setPositionX(visibleSize.width / 2);
     bgSprite->setPositionY((visibleSize.height - bgSprite->getContentSize().height) + bgSprite->getContentSize().height / 2 - 20);
