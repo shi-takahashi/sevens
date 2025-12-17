@@ -37,7 +37,10 @@ public:
     void setMyRank(const std::string& odId,
                    const std::string& name,
                    int win,
-                   int lose,
+                   int rank2,
+                   int rank3,
+                   int rank4,
+                   int streak,
                    std::function<void(std::string odId)> success,
                    std::function<void(void)> cancel = nullptr);
 

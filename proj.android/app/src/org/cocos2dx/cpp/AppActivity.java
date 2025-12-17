@@ -286,17 +286,32 @@ public class AppActivity extends Cocos2dxActivity {
      * Called from C++
      * @param odId Document ID (empty string for new user)
      * @param name Player name
-     * @param score Win count
+     * @param score Win count (1st place)
+     * @param rank2 2nd place count
+     * @param rank3 3rd place count
+     * @param rank4 4th place count
+     * @param streak Best win streak
      */
-    public static void setMyRank(final String odId, final String name, final int score) {
+    public static void setMyRank(final String odId, final String name, final int score,
+                                  final int rank2, final int rank3, final int rank4, final int streak) {
         if (db == null) {
             onScoreSaveFailed();
             return;
         }
 
+        // Calculate total games and win rate
+        int totalGames = score + rank2 + rank3 + rank4;
+        double winRate = totalGames > 0 ? (double) score / totalGames * 100 : 0;
+
         Map<String, Object> data = new HashMap<>();
         data.put("name", name);
         data.put("score", score);
+        data.put("rank2", rank2);
+        data.put("rank3", rank3);
+        data.put("rank4", rank4);
+        data.put("streak", streak);
+        data.put("totalGames", totalGames);
+        data.put("winRate", winRate);
         data.put("updatedAt", com.google.firebase.Timestamp.now());
 
         DocumentReference docRef;

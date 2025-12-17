@@ -129,13 +129,14 @@ void NameEdit::buttonTouched(Ref* pSender, ui::Widget::TouchEventType type)
                     int playerLoseCount0 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount0", 0);
                     int playerLoseCount1 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount1", 0);
                     int playerLoseCount2 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount2", 0);
-                    int playerLoseCount = playerLoseCount0 + playerLoseCount1 + playerLoseCount2;
+                    int playerStreak = UserDefault::getInstance()->getIntegerForKey("playerStreak", 0);
                     global_user_name = editBox->getText();
                     if (global_user_name.empty()) {
                         global_user_name = USER_NAME_NONE;
                     }
                     UserDefault::getInstance()->setStringForKey("userName", global_user_name);
-                    NetRanking::getNetRanking()->setMyRank(global_user_od_id, global_user_name, playerWinCount, playerLoseCount,
+                    NetRanking::getNetRanking()->setMyRank(global_user_od_id, global_user_name,
+                                                           playerWinCount, playerLoseCount0, playerLoseCount1, playerLoseCount2, playerStreak,
                                                            [](std::string odId) {
                                                                if (global_user_od_id.empty()) {
                                                                    global_user_od_id = odId;

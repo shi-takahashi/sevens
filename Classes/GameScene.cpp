@@ -479,29 +479,34 @@ void GameScene::resultDialogCallback(Ref* Sender)
         {
 #if(CC_TARGET_PLATFORM == CC_PLATFORM_IOS)
             this->resumeNext();
-            
+
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
             if (sAdflg) {
                 sAdflg = false;
                 this->resumeNext();
             } else {
-                std::random_device rnd;
-                std::mt19937 mt(rnd());
-//                std::uniform_int_distribution<int> rand_dist(1, 10);
-                std::uniform_int_distribution<int> rand_dist(1, 1);
-                int x = rand_dist(mt);
-                if (x == 1) {
-                    sAdflg = true;
-                    // 結果ダイアログを閉じる
-                    static_cast<UIDialog*>(this->getChildByTag(100))->close();
-                    // 広告を表示する
-                    NativeCodeLauncher::advertise();
-                    // ローディング中の旨を表示する
-                    std::vector<UIDialogButton*> buttons = {};
-                    auto* dialog = UIDialog::create("Now Loading…", "", "", buttons);
-                    addChild(dialog, 100, 100);
-                } else {
+                // 1位（勝利）なら広告を出さない
+                if (this->player_character->rank == 1) {
                     this->resumeNext();
+                } else {
+                    // 負けた場合は1/5の確率で広告表示
+                    std::random_device rnd;
+                    std::mt19937 mt(rnd());
+                    std::uniform_int_distribution<int> rand_dist(1, 5);
+                    int x = rand_dist(mt);
+                    if (x == 1) {
+                        sAdflg = true;
+                        // 結果ダイアログを閉じる
+                        static_cast<UIDialog*>(this->getChildByTag(100))->close();
+                        // 広告を表示する
+                        NativeCodeLauncher::advertise();
+                        // ローディング中の旨を表示する
+                        std::vector<UIDialogButton*> buttons = {};
+                        auto* dialog = UIDialog::create("Now Loading…", "", "", buttons);
+                        addChild(dialog, 100, 100);
+                    } else {
+                        this->resumeNext();
+                    }
                 }
             }
 #endif

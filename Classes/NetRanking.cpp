@@ -83,7 +83,10 @@ void NetRanking::getMyRank(const std::string& odId,
 void NetRanking::setMyRank(const std::string& odId,
                            const std::string& name,
                            int win,
-                           int lose,
+                           int rank2,
+                           int rank3,
+                           int rank4,
+                           int streak,
                            std::function<void(std::string odId)> success,
                            std::function<void(void)> cancel)
 {
@@ -98,7 +101,7 @@ void NetRanking::setMyRank(const std::string& odId,
     _setMyRankCancelCallback = cancel;
 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID)
-    JniHelper::callStaticVoidMethod("org/cocos2dx/cpp/AppActivity", "setMyRank", odId, name, win);
+    JniHelper::callStaticVoidMethod("org/cocos2dx/cpp/AppActivity", "setMyRank", odId, name, win, rank2, rank3, rank4, streak);
 #else
     if (cancel) {
         cancel();
