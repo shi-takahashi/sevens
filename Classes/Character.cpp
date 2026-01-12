@@ -278,17 +278,97 @@ void Character::runActionPass()
 {
     float game_speed = GameScene::getGameScene()->getGameSpeed();
     float delay_time = (getType() == Character::TYPE_PLAYER) ? 0 : (1 / game_speed);
-    
+
     DelayTime* wait = DelayTime::create(delay_time);
-    
-    CallFunc* action_main = CallFunc::create([this]() {
-        this->label_message->setString("パス");
+
+    CallFunc* action_main = CallFunc::create([this, game_speed]() {
+        // プレイヤーの場合のみ「パス」を表示
+        if (this->getType() == Character::TYPE_PLAYER) {
+            this->label_message->setString("パス");
+        }
         this->label_pass->setString(StringUtils::format("%d", this->pass));
         if (config_sound_setting == SETTING_ON) {
             cocos2d::experimental::AudioEngine::play2d("se_pass.wav");
         }
+
+        // NPCの場合、一時的なポップアップメッセージを表示
+        if (this->getType() == Character::TYPE_NON_PLAYER && this->thumbnail) {
+            std::random_device rd;
+            std::mt19937 mt(rd());
+
+            // 通常セリフ（キャラクターごと）
+            std::vector<std::string> msgs_panda = {"むむ…", "計算外…", "想定内", "ふむ…"};
+            std::vector<std::string> msgs_dog = {"クゥ〜ン", "ワン！", "キャン…", "くぅ…"};
+            std::vector<std::string> msgs_rabbit = {"あれ？", "えへへ", "うーん", "ぴょん"};
+
+            // レアセリフ（5%の確率）
+            std::vector<std::string> rare_panda = {"笹食べたい"};
+            std::vector<std::string> rare_dog = {"散歩行く？"};
+            std::vector<std::string> rare_rabbit = {"月が綺麗"};
+
+            std::string popup_msg;
+            std::uniform_int_distribution<int> rare_dist(1, 100);
+            bool is_rare = (rare_dist(mt) <= 5);
+
+            switch (this->character_id) {
+                case 1: {
+                    auto& msgs = is_rare ? rare_panda : msgs_panda;
+                    std::uniform_int_distribution<int> dist(0, msgs.size() - 1);
+                    popup_msg = msgs[dist(mt)];
+                    break;
+                }
+                case 2: {
+                    auto& msgs = is_rare ? rare_dog : msgs_dog;
+                    std::uniform_int_distribution<int> dist(0, msgs.size() - 1);
+                    popup_msg = msgs[dist(mt)];
+                    break;
+                }
+                case 3: {
+                    auto& msgs = is_rare ? rare_rabbit : msgs_rabbit;
+                    std::uniform_int_distribution<int> dist(0, msgs.size() - 1);
+                    popup_msg = msgs[dist(mt)];
+                    break;
+                }
+                default: popup_msg = ""; break;
+            }
+            if (!popup_msg.empty()) {
+                // 背景付きポップアップを作成
+                auto popupNode = Node::create();
+
+                // ラベルを先に作ってサイズを取得（左揃え）
+                auto label = Label::createWithSystemFont(popup_msg, "Arial", 24);
+                label->setColor(Color3B::BLACK);
+                label->setAnchorPoint(Vec2(0, 0.5f));  // 左端揃え
+                Size labelSize = label->getContentSize();
+
+                // 背景（白い角丸四角形風）- 左端基準
+                float padding = 8.0f;
+                auto bg = DrawNode::create();
+                Vec2 origin(-padding, -labelSize.height/2 - padding);
+                Vec2 dest(labelSize.width + padding, labelSize.height/2 + padding);
+                bg->drawSolidRect(origin, dest, Color4F::WHITE);
+                bg->drawRect(origin, dest, Color4F(0.3f, 0.3f, 0.3f, 1.0f));
+                bg->setGlobalZOrder(100);
+                label->setGlobalZOrder(101);
+                popupNode->addChild(bg);
+                popupNode->addChild(label);
+
+                // 位置をキャラクターごとに調整（「パス」表示位置付近）
+                Vec2 pos = this->thumbnail->getPosition() + Vec2(60, 30);
+                popupNode->setPosition(pos);
+                popupNode->setOpacity(0);
+                popupNode->setCascadeOpacityEnabled(true);
+                GameScene::getGameScene()->addChild(popupNode, 50);
+
+                auto fadeIn = FadeIn::create(0.15f);
+                auto stay = DelayTime::create(0.8f / game_speed);
+                auto fadeOut = FadeOut::create(0.15f);
+                auto remove = RemoveSelf::create();
+                popupNode->runAction(Sequence::create(fadeIn, stay, fadeOut, remove, nullptr));
+            }
+        }
     });
-    
+
     DelayTime* wait2 = DelayTime::create(0.6 / game_speed);
     
     CallFunc* action_after = CallFunc::create([this]() {
