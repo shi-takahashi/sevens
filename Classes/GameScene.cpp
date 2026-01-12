@@ -286,9 +286,21 @@ bool GameScene::touchBegan(Vec2 pos)
     if (!this->player_character->is_touch_enabled) {
         return false;
     }
-    
+
     std::vector<Card*> target_cards = this->manager->askTargetCards();
-    
+
+    // 一度全手札のハイライトをリセットして、出せるカードを光らせ直す
+    for (Card* card : this->player_character->hands->getCards()) {
+        bool canPlay = false;
+        for (Card* target : target_cards) {
+            if (card == target) {
+                canPlay = true;
+                break;
+            }
+        }
+        card->card_image->setColor(canPlay ? Color3B::WHITE : Color3B(160, 160, 160));
+    }
+
     std::vector<Card*> enable_cards = {};
     for (Card* player_card : this->player_character->hands->getCards()) {
         for (Card* target_card : target_cards) {
@@ -335,7 +347,31 @@ bool GameScene::touchBegan(Vec2 pos)
             
             if (this->player_character->touched_card) {
                 if (this->player_character->touched_card == touching_card) {
-                    // タッチしたカードが変わっていない場合何もしない
+                    // タッチしたカードが変わっていない場合、ジョーカーのハイライトだけ処理してbreak
+                    if (touching_card->isJoker()) {
+                        std::vector<Card*> joker_pair_cards = {};
+                        for (Card* player_card : this->player_character->hands->getCards()) {
+                            for (Card* target_card : this->manager->askTargetCardsWithJoker()) {
+                                if (target_card == player_card) {
+                                    bool have_proxy_card = false;
+                                    for (Card* enable_card : enable_cards) {
+                                        if (enable_card->mark == target_card->mark && !enable_card->isJoker()) {
+                                            if ((enable_card->number + 1 == target_card->number) || (enable_card->number - 1 == target_card->number)) {
+                                                have_proxy_card = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                    if (!have_proxy_card) {
+                                        joker_pair_cards.emplace_back(player_card);
+                                    }
+                                }
+                            }
+                        }
+                        for (Card* c : joker_pair_cards) {
+                            c->card_image->setColor(Color3B::WHITE);
+                        }
+                    }
                     break;
                 } else {
                     if (this->player_character->touched_card->isJoker()) {
