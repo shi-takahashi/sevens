@@ -7,6 +7,7 @@
 //
 
 #include "PlayerCharacter.h"
+#include "Manager.h"
 
 PlayerCharacter* PlayerCharacter::create(int character_id, const std::string& filename)
 {
@@ -80,8 +81,33 @@ void PlayerCharacter::setTouchEnabled(bool flg)
         this->touched_card->pair_card = nullptr;
         this->touched_card = nullptr;
     }
-    
+
     this->is_touch_enabled = flg;
     this->button_pass->setBright(flg);
     this->button_pass->setTouchEnabled(flg);
+
+    // 出せるカードをハイライト表示
+    if (flg) {
+        std::vector<Card*> target_cards = Manager::getManager()->askTargetCards();
+        for (Card* card : this->hands->getCards()) {
+            bool canPlay = false;
+            for (Card* target : target_cards) {
+                if (card == target) {
+                    canPlay = true;
+                    break;
+                }
+            }
+            // 出せるカードは明るく、出せないカードは暗く
+            if (canPlay) {
+                card->card_image->setColor(Color3B::WHITE);
+            } else {
+                card->card_image->setColor(Color3B(160, 160, 160));
+            }
+        }
+    } else {
+        // ターン終了時は全て元に戻す
+        for (Card* card : this->hands->getCards()) {
+            card->card_image->setColor(Color3B::WHITE);
+        }
+    }
 }

@@ -397,11 +397,38 @@ bool GameScene::touchBegan(Vec2 pos)
                 touching_card->card_image->setPositionY(PLAYER_CHARACTER_CARD_POSITION_Y + 30);
                 this->player_character->touched_card = touching_card;
             }
-            
+
+            // ジョーカー選択時、セットで出せるカードを追加でハイライト
+            if (this->player_character->touched_card && this->player_character->touched_card->isJoker()) {
+                // pair_card候補を計算してハイライト
+                std::vector<Card*> joker_pair_cards = {};
+                for (Card* player_card : this->player_character->hands->getCards()) {
+                    for (Card* target_card : this->manager->askTargetCardsWithJoker()) {
+                        if (target_card == player_card) {
+                            bool have_proxy_card = false;
+                            for (Card* enable_card : enable_cards) {
+                                if (enable_card->mark == target_card->mark && !enable_card->isJoker()) {
+                                    if ((enable_card->number + 1 == target_card->number) || (enable_card->number - 1 == target_card->number)) {
+                                        have_proxy_card = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (!have_proxy_card) {
+                                joker_pair_cards.emplace_back(player_card);
+                            }
+                        }
+                    }
+                }
+                for (Card* card : joker_pair_cards) {
+                    card->card_image->setColor(Color3B::WHITE);
+                }
+            }
+
             break;
         }
     }
-    
+
     return true;
 }
 
@@ -427,7 +454,11 @@ void GameScene::touchEnd()
     this->player_character->is_touch_enabled = false;
     this->player_character->button_pass->setBright(false);
     this->player_character->button_pass->setTouchEnabled(false);
-    
+    // カードのハイライトをリセット
+    for (Card* card : this->player_character->hands->getCards()) {
+        card->card_image->setColor(Color3B::WHITE);
+    }
+
     this->player_character->process(Command::PUT_NORMAL);
 }
 
@@ -439,7 +470,7 @@ void GameScene::onPassButtonTouched(Ref* pSender, ui::Widget::TouchEventType typ
     if (!this->player_character->is_touch_enabled) {
         return;
     }
-    
+
     switch (type) {
         case ui::Widget::TouchEventType::BEGAN: {
             if (this->player_character->touched_card) {
@@ -451,6 +482,10 @@ void GameScene::onPassButtonTouched(Ref* pSender, ui::Widget::TouchEventType typ
             this->player_character->is_touch_enabled = false;
             this->player_character->button_pass->setBright(false);
             this->player_character->button_pass->setTouchEnabled(false);
+            // カードのハイライトをリセット
+            for (Card* card : this->player_character->hands->getCards()) {
+                card->card_image->setColor(Color3B::WHITE);
+            }
             this->player_character->process(Command::PUT_NORMAL);
             break;
         }
