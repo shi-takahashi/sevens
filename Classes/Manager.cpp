@@ -486,7 +486,7 @@ void Manager::setRank(Character* character)
             rank[wk_character->rank - 1] = wk_character->character_id;
         }
     }
-    
+
     std::vector<int> rank_index;
     character->pass <= 3 ? rank_index = {0, 1, 2, 3} : rank_index = {3, 2, 1, 0};
     for (int i : rank_index) {
@@ -498,6 +498,15 @@ void Manager::setRank(Character* character)
                     cocos2d::experimental::AudioEngine::play2d("se_clear.mp3");
                 }
             }
+            // NPCの順位確定時にセリフを表示
+            MessageType msgType;
+            switch (character->rank) {
+                case 1: msgType = MessageType::RANK_1; break;
+                case 2: msgType = MessageType::RANK_2; break;
+                case 3: msgType = MessageType::RANK_3; break;
+                default: msgType = MessageType::RANK_4; break;
+            }
+            character->showPopupMessage(msgType);
             break;
         }
     }

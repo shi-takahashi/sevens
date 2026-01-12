@@ -9,6 +9,7 @@
 #include "Character.h"
 #include "GameScene.h"
 #include "Manager.h"
+#include <map>
 //#include "Util.h"
 
 const int Character::TYPE_PLAYER        = 1;
@@ -281,7 +282,7 @@ void Character::runActionPass()
 
     DelayTime* wait = DelayTime::create(delay_time);
 
-    CallFunc* action_main = CallFunc::create([this, game_speed]() {
+    CallFunc* action_main = CallFunc::create([this]() {
         // プレイヤーの場合のみ「パス」を表示
         if (this->getType() == Character::TYPE_PLAYER) {
             this->label_message->setString("パス");
@@ -291,82 +292,8 @@ void Character::runActionPass()
             cocos2d::experimental::AudioEngine::play2d("se_pass.wav");
         }
 
-        // NPCの場合、一時的なポップアップメッセージを表示
-        if (this->getType() == Character::TYPE_NON_PLAYER && this->thumbnail) {
-            std::random_device rd;
-            std::mt19937 mt(rd());
-
-            // 通常セリフ（キャラクターごと）
-            std::vector<std::string> msgs_panda = {"むむ…", "計算外…", "想定内", "ふむ…"};
-            std::vector<std::string> msgs_dog = {"クゥ〜ン", "ワン！", "キャン…", "くぅ…"};
-            std::vector<std::string> msgs_rabbit = {"あれ？", "えへへ", "うーん", "ぴょん"};
-
-            // レアセリフ（5%の確率）
-            std::vector<std::string> rare_panda = {"笹食べたい"};
-            std::vector<std::string> rare_dog = {"散歩行く？"};
-            std::vector<std::string> rare_rabbit = {"月が綺麗"};
-
-            std::string popup_msg;
-            std::uniform_int_distribution<int> rare_dist(1, 100);
-            bool is_rare = (rare_dist(mt) <= 5);
-
-            switch (this->character_id) {
-                case 1: {
-                    auto& msgs = is_rare ? rare_panda : msgs_panda;
-                    std::uniform_int_distribution<int> dist(0, msgs.size() - 1);
-                    popup_msg = msgs[dist(mt)];
-                    break;
-                }
-                case 2: {
-                    auto& msgs = is_rare ? rare_dog : msgs_dog;
-                    std::uniform_int_distribution<int> dist(0, msgs.size() - 1);
-                    popup_msg = msgs[dist(mt)];
-                    break;
-                }
-                case 3: {
-                    auto& msgs = is_rare ? rare_rabbit : msgs_rabbit;
-                    std::uniform_int_distribution<int> dist(0, msgs.size() - 1);
-                    popup_msg = msgs[dist(mt)];
-                    break;
-                }
-                default: popup_msg = ""; break;
-            }
-            if (!popup_msg.empty()) {
-                // 背景付きポップアップを作成
-                auto popupNode = Node::create();
-
-                // ラベルを先に作ってサイズを取得（左揃え）
-                auto label = Label::createWithSystemFont(popup_msg, "Arial", 24);
-                label->setColor(Color3B::BLACK);
-                label->setAnchorPoint(Vec2(0, 0.5f));  // 左端揃え
-                Size labelSize = label->getContentSize();
-
-                // 背景（白い角丸四角形風）- 左端基準
-                float padding = 8.0f;
-                auto bg = DrawNode::create();
-                Vec2 origin(-padding, -labelSize.height/2 - padding);
-                Vec2 dest(labelSize.width + padding, labelSize.height/2 + padding);
-                bg->drawSolidRect(origin, dest, Color4F::WHITE);
-                bg->drawRect(origin, dest, Color4F(0.3f, 0.3f, 0.3f, 1.0f));
-                bg->setGlobalZOrder(100);
-                label->setGlobalZOrder(101);
-                popupNode->addChild(bg);
-                popupNode->addChild(label);
-
-                // 位置をキャラクターごとに調整（「パス」表示位置付近）
-                Vec2 pos = this->thumbnail->getPosition() + Vec2(60, 30);
-                popupNode->setPosition(pos);
-                popupNode->setOpacity(0);
-                popupNode->setCascadeOpacityEnabled(true);
-                GameScene::getGameScene()->addChild(popupNode, 50);
-
-                auto fadeIn = FadeIn::create(0.15f);
-                auto stay = DelayTime::create(0.8f / game_speed);
-                auto fadeOut = FadeOut::create(0.15f);
-                auto remove = RemoveSelf::create();
-                popupNode->runAction(Sequence::create(fadeIn, stay, fadeOut, remove, nullptr));
-            }
-        }
+        // NPCの場合、ポップアップメッセージを表示
+        this->showPopupMessage(MessageType::PASS);
     });
 
     DelayTime* wait2 = DelayTime::create(0.6 / game_speed);
@@ -392,4 +319,103 @@ bool Character::isFinish()
 bool Character::isPlayer()
 {
     return this->getType() == Character::TYPE_PLAYER;
+}
+
+void Character::showPopupMessage(MessageType type)
+{
+    // NPCの場合のみポップアップを表示
+    if (this->getType() != Character::TYPE_NON_PLAYER || !this->thumbnail) {
+        return;
+    }
+
+    float game_speed = GameScene::getGameScene()->getGameSpeed();
+    std::random_device rd;
+    std::mt19937 mt(rd());
+
+    // キャラクターごと・状況ごとのセリフ
+    std::map<MessageType, std::vector<std::string>> msgs_panda = {
+        {MessageType::PASS,   {"むむ…", "計算外…", "想定内", "ふむ…"}},
+        {MessageType::RANK_1, {"当然", "計算通り"}},
+        {MessageType::RANK_2, {"まあまあ", "悪くない"}},
+        {MessageType::RANK_3, {"むむむ…", "次は…"}},
+        {MessageType::RANK_4, {"想定外…", "なぜ…"}}
+    };
+    std::map<MessageType, std::vector<std::string>> msgs_dog = {
+        {MessageType::PASS,   {"クゥ〜ン", "ワン！", "キャン…", "くぅ…"}},
+        {MessageType::RANK_1, {"ワンワン!", "やった！"}},
+        {MessageType::RANK_2, {"ワン！", "まぁまぁ"}},
+        {MessageType::RANK_3, {"クゥン…", "うぅ…"}},
+        {MessageType::RANK_4, {"キャイン", "しょぼん"}}
+    };
+    std::map<MessageType, std::vector<std::string>> msgs_rabbit = {
+        {MessageType::PASS,   {"あれ？", "えへへ", "うーん", "ぴょん"}},
+        {MessageType::RANK_1, {"やったー", "ぴょん！"}},
+        {MessageType::RANK_2, {"えへへ", "まあまあ"}},
+        {MessageType::RANK_3, {"あれれ？", "うーん"}},
+        {MessageType::RANK_4, {"えーん", "しくしく"}}
+    };
+
+    // レアセリフ（パス時のみ、5%の確率）
+    std::map<int, std::string> rare_msgs = {
+        {1, "笹食べたい"},
+        {2, "散歩行く？"},
+        {3, "月が綺麗"}
+    };
+
+    std::string popup_msg;
+
+    // レア判定（パス時のみ）
+    bool is_rare = false;
+    if (type == MessageType::PASS) {
+        std::uniform_int_distribution<int> rare_dist(1, 100);
+        is_rare = (rare_dist(mt) <= 5);
+    }
+
+    if (is_rare) {
+        popup_msg = rare_msgs[this->character_id];
+    } else {
+        std::vector<std::string>* msgs = nullptr;
+        switch (this->character_id) {
+            case 1: msgs = &msgs_panda[type]; break;
+            case 2: msgs = &msgs_dog[type]; break;
+            case 3: msgs = &msgs_rabbit[type]; break;
+        }
+        if (msgs && !msgs->empty()) {
+            std::uniform_int_distribution<int> dist(0, msgs->size() - 1);
+            popup_msg = (*msgs)[dist(mt)];
+        }
+    }
+
+    if (popup_msg.empty()) return;
+
+    // 背景付きポップアップを作成
+    auto popupNode = Node::create();
+
+    auto label = Label::createWithSystemFont(popup_msg, "Arial", 24);
+    label->setColor(Color3B::BLACK);
+    label->setAnchorPoint(Vec2(0, 0.5f));
+    Size labelSize = label->getContentSize();
+
+    float padding = 8.0f;
+    auto bg = DrawNode::create();
+    Vec2 origin(-padding, -labelSize.height/2 - padding);
+    Vec2 dest(labelSize.width + padding, labelSize.height/2 + padding);
+    bg->drawSolidRect(origin, dest, Color4F::WHITE);
+    bg->drawRect(origin, dest, Color4F(0.3f, 0.3f, 0.3f, 1.0f));
+    bg->setGlobalZOrder(100);
+    label->setGlobalZOrder(101);
+    popupNode->addChild(bg);
+    popupNode->addChild(label);
+
+    Vec2 pos = this->thumbnail->getPosition() + Vec2(60, 30);
+    popupNode->setPosition(pos);
+    popupNode->setOpacity(0);
+    popupNode->setCascadeOpacityEnabled(true);
+    GameScene::getGameScene()->addChild(popupNode, 50);
+
+    auto fadeIn = FadeIn::create(0.15f);
+    auto stay = DelayTime::create(0.8f / game_speed);
+    auto fadeOut = FadeOut::create(0.15f);
+    auto remove = RemoveSelf::create();
+    popupNode->runAction(Sequence::create(fadeIn, stay, fadeOut, remove, nullptr));
 }

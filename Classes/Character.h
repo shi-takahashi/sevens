@@ -14,12 +14,21 @@
 
 USING_NS_CC;
 
+// セリフの種類
+enum class MessageType {
+    PASS,
+    RANK_1,
+    RANK_2,
+    RANK_3,
+    RANK_4
+};
+
 class Character : public cocos2d::Ref
-{    
+{
 public:
     static const int TYPE_PLAYER;
     static const int TYPE_NON_PLAYER;
-    
+
     int character_id;
     Sprite* thumbnail;
     Hands* hands;
@@ -36,7 +45,8 @@ public:
     virtual std::vector<Card*> process(Command command, Card* designated_card = nullptr);
     bool isFinish();
     bool isPlayer();
-    
+    void showPopupMessage(MessageType type);
+
 private:
     virtual Card* choiceCard() { return nullptr; };
     std::vector<Card*> extractCardList(Command, Card* designated_card = nullptr);
