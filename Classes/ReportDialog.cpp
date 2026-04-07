@@ -7,7 +7,6 @@
 //
 
 #include "ReportDialog.h"
-#include "NetRanking.h"
 
 USING_NS_CC;
 
@@ -70,13 +69,6 @@ bool ReportDialog::init()
     item3->setString("連勝記録");
     bgSprite->addChild(item3, 0);
     
-    Label* item4 = Label::createWithSystemFont("", "ariel", 32);
-    item4->setAnchorPoint(Vec2(0, 0));
-    item4->setPosition(Vec2(30, 50));
-    item4->setColor(Color3B(255, 250, 220));
-    item4->setString("全国順位");
-    bgSprite->addChild(item4, 0);
-    
     int playerWinCount = UserDefault::getInstance()->getIntegerForKey("playerWinCount", 0);
     int playerLoseCount0 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount0", 0);
     int playerLoseCount1 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount1", 0);
@@ -113,24 +105,6 @@ bool ReportDialog::init()
     streak->setColor(Color3B(255, 250, 220));
     streak->setString(StringUtils::format("%d", playerStreak));
     bgSprite->addChild(streak, 0);
-    
-    Label* ranking_label = Label::createWithSystemFont("", "ariel", 32);
-    ranking_label->setAnchorPoint(Vec2(0, 0));
-    ranking_label->setPosition(Vec2(180, 50));
-    ranking_label->setColor(Color3B(255, 250, 220));
-    bgSprite->addChild(ranking_label, 0);
-
-    NetRanking::getNetRanking()->getMyRank(global_user_od_id,
-                                           [bgSprite, ranking_label](int ranking) {
-                                               ranking_label->setString(StringUtils::format("%d位", ranking));
-                                               bgSprite->setVisible(true);
-                                           },
-                                           [bgSprite, ranking_label]() {
-                                               ranking_label->setString("?");
-                                               ranking_label->setVisible(true);
-                                               bgSprite->setVisible(true);
-                                           }
-                                           );
 
     return true;
 }

@@ -49,23 +49,18 @@ bool TitleScene::init()
     nameButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::nameButtonTouched, this));
     this->addChild(nameButton);
 
-    ui::Button* rankingButton { ui::Button::create("ranking_button.png") };
-    rankingButton->setPosition(Vec2(1194.0f, 312.0f));
-    rankingButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::rankingButtonTouched, this));
-    this->addChild(rankingButton);
-    
     ui::Button* resultButton { ui::Button::create("report_button.png") };
-    resultButton->setPosition(Vec2(1194.0f, 226.0f));
+    resultButton->setPosition(Vec2(1194.0f, 312.0f));
     resultButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::resultButtonTouched, this));
     this->addChild(resultButton);
     
     ui::Button* optionButton { ui::Button::create("option_button.png") };
-    optionButton->setPosition(Vec2(1194.0f, 140.0f));
+    optionButton->setPosition(Vec2(1194.0f, 226.0f));
     optionButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::optionButtonTouched, this));
     this->addChild(optionButton);
-    
+
     ui::Button* finishButton { ui::Button::create("finish_button.png") };
-    finishButton->setPosition(Vec2(1194.0f, 54.0f));
+    finishButton->setPosition(Vec2(1194.0f, 140.0f));
     finishButton->addTouchEventListener(CC_CALLBACK_2(TitleScene::finishButtonTouched, this));
     this->addChild(finishButton);
     
@@ -113,22 +108,6 @@ void TitleScene::nameButtonTouched(Ref* pSender, ui::Widget::TouchEventType type
         {
             NameEdit* option { NameEdit::create() };
             this->addChild(option);
-            break;
-        }
-            
-        default:
-            break;
-    }
-}
-
-void TitleScene::rankingButtonTouched(Ref* pSender, ui::Widget::TouchEventType type)
-{
-    switch(type)
-    {
-        case ui::Widget::TouchEventType::BEGAN:
-        {
-            RankingDialog* report { RankingDialog::create() };
-            this->addChild(report);
             break;
         }
             

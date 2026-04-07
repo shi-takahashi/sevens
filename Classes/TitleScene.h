@@ -10,7 +10,6 @@
 #include "Common.h"
 #include "GameScene.h"
 #include "NameEdit.h"
-#include "RankingDialog.h"
 #include "ReportDialog.h"
 #include "OptionDialog.h"
 
@@ -24,7 +23,6 @@ public:
     CREATE_FUNC(TitleScene);
     void touchEvent(Ref* pSender, ui::Widget::TouchEventType type);
     void nameButtonTouched(Ref* pSender, ui::Widget::TouchEventType type);
-    void rankingButtonTouched(Ref* pSender, ui::Widget::TouchEventType type);
     void resultButtonTouched(Ref* pSender, ui::Widget::TouchEventType type);
     void optionButtonTouched(Ref* pSender, ui::Widget::TouchEventType type);
     void finishButtonTouched(Ref* pSender, ui::Widget::TouchEventType type);

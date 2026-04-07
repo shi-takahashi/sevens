@@ -138,33 +138,11 @@ bool OptionDialog::init()
     tunnelButtonOff->setTag(TUNNEL_BUTTON_OFF_TAG);
     tunnelButtonOff->setScale(0.5f);
     bgSprite->addChild(tunnelButtonOff);
-    
-    Label* netLabel = Label::createWithSystemFont("", "ariel", 40);
-    netLabel->setAnchorPoint(Vec2(0, 0));
-    netLabel->setPosition(Vec2(15, 60));
-    netLabel->setColor(Color3B(255, 255, 255));
-    netLabel->setString("通信");
-    bgSprite->addChild(netLabel, 0);
-
-    netButtonOn = ui::Button::create();
-    netButtonOn->setPosition(Vec2(295.0f, 85));
-    netButtonOn->addTouchEventListener(CC_CALLBACK_2(OptionDialog::buttonTouched, this));
-    netButtonOn->setTag(NET_BUTTON_ON_TAG);
-    netButtonOn->setScale(0.5f);
-    bgSprite->addChild(netButtonOn);
-
-    netButtonOff = ui::Button::create();
-    netButtonOff->setPosition(Vec2(415.0f, 85));
-    netButtonOff->addTouchEventListener(CC_CALLBACK_2(OptionDialog::buttonTouched, this));
-    netButtonOff->setTag(NET_BUTTON_OFF_TAG);
-    netButtonOff->setScale(0.5f);
-    bgSprite->addChild(netButtonOff);
 
     soundSettingDisplayChange();
     speedSettingDisplayChange();
     jokerSettingDisplayChange();
     tunnelSettingDisplayChange();
-    netSettingDisplayChange();
     
     return true;
 }
@@ -228,17 +206,6 @@ void OptionDialog::tunnelSettingDisplayChange()
     } else {
         tunnelButtonOn->loadTextureNormal("on_valid.png");
         tunnelButtonOff->loadTextureNormal("off_invalid.png");
-    }
-}
-
-void OptionDialog::netSettingDisplayChange()
-{
-    if (config_use_net == SETTING_NO_USE) {
-        netButtonOn->loadTextureNormal("on_invalid.png");
-        netButtonOff->loadTextureNormal("off_valid.png");
-    } else {
-        netButtonOn->loadTextureNormal("on_valid.png");
-        netButtonOff->loadTextureNormal("off_invalid.png");
     }
 }
 
@@ -331,24 +298,6 @@ void OptionDialog::buttonTouched(Ref* pSender, ui::Widget::TouchEventType type)
                     config_use_tunnel = SETTING_NO_USE;
                     UserDefault::getInstance()->setIntegerForKey("useTunnel", config_use_tunnel);
                     tunnelSettingDisplayChange();
-                }
-                break;
-            }
-            case NET_BUTTON_ON_TAG:
-            {
-                if (config_use_net == SETTING_NO_USE) {
-                    config_use_net = SETTING_USE;
-                    UserDefault::getInstance()->setIntegerForKey("useNet", config_use_net);
-                    netSettingDisplayChange();
-                }
-                break;
-            }
-            case NET_BUTTON_OFF_TAG:
-            {
-                if (config_use_net == SETTING_USE) {
-                    config_use_net = SETTING_NO_USE;
-                    UserDefault::getInstance()->setIntegerForKey("useNet", config_use_net);
-                    netSettingDisplayChange();
                 }
                 break;
             }

@@ -61,11 +61,9 @@ list(APPEND GAME_SOURCE
      Classes/Manager.cpp
      Classes/NameEdit.cpp
      Classes/NativeCodeLauncher.cpp
-     Classes/NetRanking.cpp
      Classes/NonPlayerCharacter.cpp
      Classes/OptionDialog.cpp
      Classes/PlayerCharacter.cpp
-     Classes/RankingDialog.cpp
      Classes/ReportDialog.cpp
      Classes/TitleScene.cpp
      Classes/UIDialog.cpp
@@ -84,15 +82,12 @@ list(APPEND GAME_HEADER
      Classes/Manager.h
      Classes/NameEdit.h
      Classes/NativeCodeLauncher.h
-     Classes/NetRanking.h
      Classes/NonPlayerCharacter.h
      Classes/OptionDialog.h
      Classes/PlayerCharacter.h
-     Classes/RankingDialog.h
      Classes/ReportDialog.h
      Classes/TitleScene.h
      Classes/UIDialog.h
-     Classes/picojson.h
      )
 
 if(ANDROID)

@@ -8,7 +8,6 @@
 
 
 #include "NameEdit.h"
-#include "NetRanking.h"
 
 USING_NS_CC;
 
@@ -125,26 +124,11 @@ void NameEdit::buttonTouched(Ref* pSender, ui::Widget::TouchEventType type)
             {
                 case DECISION_BUTTON_TAG:
                 {
-                    int playerWinCount = UserDefault::getInstance()->getIntegerForKey("playerWinCount", 0);
-                    int playerLoseCount0 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount0", 0);
-                    int playerLoseCount1 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount1", 0);
-                    int playerLoseCount2 = UserDefault::getInstance()->getIntegerForKey("playerLoseCount2", 0);
-                    int playerStreak = UserDefault::getInstance()->getIntegerForKey("playerStreak", 0);
                     global_user_name = editBox->getText();
                     if (global_user_name.empty()) {
                         global_user_name = USER_NAME_NONE;
                     }
                     UserDefault::getInstance()->setStringForKey("userName", global_user_name);
-                    NetRanking::getNetRanking()->setMyRank(global_user_od_id, global_user_name,
-                                                           playerWinCount, playerLoseCount0, playerLoseCount1, playerLoseCount2, playerStreak,
-                                                           [](std::string odId) {
-                                                               if (global_user_od_id.empty()) {
-                                                                   global_user_od_id = odId;
-                                                                   UserDefault::getInstance()->setStringForKey("userOdId", global_user_od_id);
-                                                               }
-                                                           },
-                                                           [](){}
-                                                           );
                     this->removeFromParentAndCleanup(true);
                     break;
                 }

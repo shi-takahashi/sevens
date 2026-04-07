@@ -1,7 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.gms.google-services'
 
 android {
     namespace 's_takahashi.java_conf.gr.jp'
@@ -136,10 +135,4 @@ android.applicationVariants.all { variant ->
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':libcocos2dx')
-    implementation 'com.google.android.gms:play-services-ads:22.6.0'
-
-    // Firebase
-    implementation platform('com.google.firebase:firebase-bom:33.7.0')
-    implementation 'com.google.firebase:firebase-analytics'
-    implementation 'com.google.firebase:firebase-firestore'
 }

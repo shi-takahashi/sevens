@@ -21,11 +21,9 @@ LOCAL_SRC_FILES := hellocpp/main.cpp \
                    ../../../Classes/Manager.cpp \
                    ../../../Classes/NameEdit.cpp \
                    ../../../Classes/NativeCodeLauncher.cpp \
-                   ../../../Classes/NetRanking.cpp \
                    ../../../Classes/NonPlayerCharacter.cpp \
                    ../../../Classes/OptionDialog.cpp \
                    ../../../Classes/PlayerCharacter.cpp \
-                   ../../../Classes/RankingDialog.cpp \
                    ../../../Classes/ReportDialog.cpp \
                    ../../../Classes/TitleScene.cpp \
                    ../../../Classes/UIDialog.cpp

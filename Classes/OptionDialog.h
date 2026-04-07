@@ -22,8 +22,6 @@
 #define JOKER_BUTTON_OFF_TAG 8
 #define TUNNEL_BUTTON_ON_TAG 9
 #define TUNNEL_BUTTON_OFF_TAG 10
-#define NET_BUTTON_ON_TAG 11
-#define NET_BUTTON_OFF_TAG 12
 
 #include <stdio.h>
 #include "cocos2d.h"
@@ -56,14 +54,11 @@ private:
     ui::Button* jokerButtonOff;
     ui::Button* tunnelButtonOn;
     ui::Button* tunnelButtonOff;
-    ui::Button* netButtonOn;
-    ui::Button* netButtonOff;
-    
+
     void soundSettingDisplayChange();
     void speedSettingDisplayChange();
     void jokerSettingDisplayChange();
     void tunnelSettingDisplayChange();
-    void netSettingDisplayChange();
     
 };
 
