@@ -18,8 +18,8 @@ android {
         applicationId "s_takahashi.java_conf.gr.jp"
         minSdkVersion PROP_MIN_SDK_VERSION
         targetSdkVersion PROP_TARGET_SDK_VERSION
-        versionCode 23
-        versionName "1.6"
+        versionCode 24
+        versionName "1.7"
 
         externalNativeBuild {
             if (PROP_BUILD_TYPE == 'ndk-build') {
